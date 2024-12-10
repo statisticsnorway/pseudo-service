@@ -1,0 +1,213 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: pseudo-service
+  namespace: {{team}}
+  labels:
+    team: {{team}}
+spec:
+  image: "{{ image }}"  # Injected from the GitHub Action
+  port: 10210
+  replicas:
+    max: 5
+    min: 1
+  resources:
+    requests:
+      cpu: 200m
+      memory: 2Gi
+    limits:
+      memory: 12Gi
+
+  ingresses:
+    - https://pseudo-service.intern.ssb.no
+
+  accessPolicy:
+    outbound:
+      external:
+        - host: "auth.ssb.no"
+        - host: "keycloak.prod-bip-app.ssb.no"
+        - host: "cloudkms.googleapis.com"
+        - host: "secretmanager.googleapis.com"
+        - host: "www.googleapis.com"
+        - host: "cloudidentity.googleapis.com"
+
+  liveness:
+    path: /health/liveness
+    port: 10210
+  readiness:
+    path: /health/readiness
+    port: 10210
+  startup:
+    path: /health/readiness
+    port: 10210
+
+  env:
+    - name: MICRONAUT_CONFIG_FILES
+      value: /conf/bootstrap-prod.yml,/conf/application-prod.yml
+    - name: LOGBACK_CONFIGURATION_FILE
+      value: /conf/logback-prod.xml
+
+  envFrom:
+    - secret: pseudo-key-config
+    - secret: pseudo-elevated-users
+
+  filesFrom:
+    - configmap: pseudo-application-prod-configmap
+      mountPath:  /conf
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pseudo-application-prod-configmap
+  namespace: {{team}}
+  labels:
+    team: {{team}}
+data:
+  bootstrap-prod.yml: |-
+    micronaut:
+      application:
+        name: pseudo-service
+      config-client:
+        enabled: true
+    gcp:
+      project-id: prod-dapla-pseudo-1530
+
+  application-prod.yml: |-
+    micronaut:
+      application:
+        name: pseudo-service
+      server:
+        port: 10210
+        cors.enabled: true
+        idle-timeout: 60m
+        read-idle-timeout: 60m
+        write-idle-timeout: 60m
+        thread-selection: AUTO
+        max-request-size: 2gb
+        multipart:
+          max-file-size: 2gb
+
+      netty:
+        event-loops:
+          other:
+            num-threads: 100
+            prefer-native-transport: true
+
+      http:
+        client:
+          event-loop-group: other
+          read-timeout: 60s
+
+        services:
+          sid-service:
+            url: 'http://reg-freg-p-sid-lookup-service.freg.svc.cluster.local'
+            path: '/v2'
+            read-timeout: 60s
+            pool:
+              enabled: true
+              max-connections: 50
+          cloud-identity-service:
+            url: 'https://cloudidentity.googleapis.com'
+            path: '/v1'
+            read-timeout: 60s
+
+      caches:
+        secrets:
+          expire-after-access: 15m
+        cloud-identity-service-cache:
+          expire-after-write: 1m
+
+      router:
+        static-resources:
+          swagger:
+            paths: classpath:META-INF/swagger
+            mapping: /api-docs/**
+          swagger-ui:
+            paths: classpath:META-INF/swagger/views/swagger-ui
+            mapping: /api-docs/swagger-ui/**
+          rapidoc:
+            paths: classpath:META-INF/swagger/views/rapidoc
+            mapping: /api-docs/rapidoc/**
+          redoc:
+            paths: classpath:META-INF/swagger/views/redoc
+            mapping: /api-docs/redoc/**
+
+      security:
+        enabled: true
+        intercept-url-map:
+          - pattern: /api-docs/**
+            httpMethod: GET
+            access:
+              - isAnonymous()
+        token:
+          name-key: email
+          jwt:
+            signatures:
+              jwks:
+                  keycloak-nais:
+                    url: 'https://auth.ssb.no/realms/ssb/protocol/openid-connect/certs'
+                  keycloak-bip:
+                    url: 'https://keycloak.prod-bip-app.ssb.no/auth/realms/ssb/protocol/openid-connect/certs'
+                  google:
+                    url: 'https://www.googleapis.com/oauth2/v3/certs'
+
+        basic-auth:
+          enabled: false
+
+    endpoints:
+      prometheus:
+        sensitive: false
+      info:
+        enabled: true
+        sensitive: false
+
+    logger:
+      levels:
+        io.micronaut.security: INFO
+        no.ssb.dlp.pseudo.service: INFO
+        io.micronaut.security.token.jwt.validator: DEBUG
+
+    services:
+      secrets:
+        impl: GCP
+
+    gcp:
+      kms:
+        key-uris:
+          - ${PSEUDO_KEK_URI}
+
+      http:
+        client:
+          filter:
+            project-id: 'prod-dapla-pseudo-1530'
+            services:
+              cloud-identity-service:
+                audience: "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
+
+    pseudo.secrets:
+      ssb-common-key-1:
+        id: ${SSB-COMMON-KEY-1-KEY-ID}
+        type: TINK_WDEK
+      ssb-common-key-2:
+        id: ${SSB-COMMON-KEY-2-KEY-ID}
+        type: TINK_WDEK
+      papis-common-key-1:
+        id: ${PAPIS-COMMON-KEY-1-KEY-ID}
+        type: TINK_WDEK
+
+    export:
+      default-target-root: gs://ssb-prod-dapla-pseudo-service-data-export/felles
+
+    sid.mapper.partition.size: 100000
+
+    app-roles:
+      # When using isAuthenticated() the JWT token must be signed by this trusted-issuer
+      trusted-issuers:
+        - https://keycloak.prod-bip-app.ssb.no/auth/realms/ssb
+        - https://auth.ssb.no/realms/ssb
+      users: ${PSEUDO_USERS}
+      # admins: ${PSEUDO_ADMINS}
+      users-group: pseudo-service-user-p@ssb.no
+      admins-group: pseudo-service-admin-p@ssb.no

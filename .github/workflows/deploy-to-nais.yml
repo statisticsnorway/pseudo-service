@@ -79,6 +79,6 @@ jobs:
         env:
           CLUSTER: ${{ inputs.cluster }}
           RESOURCE: ${{ inputs.nais-config-path }}
-          VAR: image=${{ inputs.registry }}/${{ secrets.NAIS_MANAGEMENT_PROJECT_ID }}/${{ inputs.repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
+          VAR: image=${{ inputs.registry }}/${{ secrets.NAIS_MANAGEMENT_PROJECT_ID }}/${{ inputs.repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }},team=dapla-stat
           DEPLOY_SERVER: deploy.ssb.cloud.nais.io:443
           REF: ${{ inputs.ref }}
