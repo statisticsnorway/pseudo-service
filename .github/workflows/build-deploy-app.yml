@@ -1,8 +1,7 @@
 on:
-  release:
-    types: [ published ]
   pull_request: ## ONLY FOR TESTING, SHOULD BE REMOVED AFTER DEPLOY PR IS MERGED
-    branches: [nais-deploy]
+    branches: 
+      - master
   push:
     branches:
       - master
@@ -82,15 +81,9 @@ jobs:
       - name: Generate image tags
         id: nais-deploy-vars
         run: |
-          if [[ ${{github.event_name}} == "release" ]]; then
-            echo "nais_tag=${{ steps.version-tag.outputs.version_tag }}" >> "$GITHUB_OUTPUT"
-            echo "cluster=prod" >> "$GITHUB_OUTPUT"
-            echo "nais_config_path=.nais/prod/nais.yaml" >> "$GITHUB_OUTPUT"
-          else
-            echo "nais_tag=${{ steps.docker-push.outputs.tag }}" >> "$GITHUB_OUTPUT"
-            echo "cluster=test" >> "$GITHUB_OUTPUT"
-            echo "nais_config_path=.nais/test/nais.yaml" >> "$GITHUB_OUTPUT"
-          fi
+          echo "nais_tag=${{ steps.docker-push.outputs.tag }}" >> "$GITHUB_OUTPUT"
+          echo "cluster=prod" >> "$GITHUB_OUTPUT"
+          echo "nais_config_path=.nais/prod/nais.yaml" >> "$GITHUB_OUTPUT"
       
   deploy:
     name: Deploy to NAIS
