@@ -39,7 +39,7 @@ jobs:
         env:
           CLUSTER: test
           RESOURCE: .nais/alerts.yaml,ext_alertconfig/alertconfig.yaml
-          VAR: cluster=test,team=${{ env.team }}
+          VAR: cluster=test,team=${{ env.TEAM }}
           DEPLOY_SERVER: deploy.ssb.cloud.nais.io:443
 
   prod-deploy:
@@ -63,5 +63,5 @@ jobs:
         env:
           CLUSTER: prod
           RESOURCE: .nais/alerts.yaml,ext_alertconfig/alertconfig.yaml
-          VAR: cluster=prod,team=${{ env.team }}
+          VAR: cluster=prod,team=${{ env.TEAM }}
           DEPLOY_SERVER: deploy.ssb.cloud.nais.io:443
