@@ -37,6 +37,8 @@ spec:
             service: pseudo-service
             namespace: dapla-stat
             severity: warning
+            alertmanager_custom_config: dapla-stat
+            alert_type: custom
 
         # This alert checks if memory usage exceeds 90% of the 12GB limit, which could cause instability.
         - alert: HighMemoryUsage
@@ -50,6 +52,8 @@ spec:
             service: pseudo-service
             namespace: dapla-stat
             severity: warning
+            alertmanager_custom_config: dapla-stat
+            alert_type: custom
 
         # This alert detects a high number of error logs in pseudo-service.
         - alert: HighNumberOfErrors
@@ -63,6 +67,8 @@ spec:
             service: pseudo-service
             namespace: dapla-stat
             severity: critical
+            alertmanager_custom_config: dapla-stat
+            alert_type: custom
 
         # This alert monitors the number of pod restarts for pseudo-service and triggers if more than 3 restarts occur within 15 minutes.
         - alert: HighPodRestarts
@@ -76,3 +82,5 @@ spec:
             service: pseudo-service
             namespace: dapla-stat
             severity: warning
+            alertmanager_custom_config: dapla-stat
+            alert_type: custom

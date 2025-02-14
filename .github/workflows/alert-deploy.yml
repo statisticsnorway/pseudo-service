@@ -14,6 +14,8 @@ on:
   workflow_dispatch:
 permissions:
   id-token: write
+env:
+  TEAM: dapla-stat
 
 jobs:
   test-deploy:
@@ -37,7 +39,7 @@ jobs:
         env:
           CLUSTER: test
           RESOURCE: .nais/alerts.yaml,ext_alertconfig/alertconfig.yaml
-          VAR: cluster=test
+          VAR: cluster=test,team=${{ env.team }}
           DEPLOY_SERVER: deploy.ssb.cloud.nais.io:443
 
   prod-deploy:
@@ -61,5 +63,5 @@ jobs:
         env:
           CLUSTER: prod
           RESOURCE: .nais/alerts.yaml,ext_alertconfig/alertconfig.yaml
-          VAR: cluster=prod
+          VAR: cluster=prod,team=${{ env.team }}
           DEPLOY_SERVER: deploy.ssb.cloud.nais.io:443
