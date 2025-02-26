@@ -65,3 +65,4 @@ jobs:
           RESOURCE: .nais/alerts.yaml,ext_alertconfig/alertconfig.yaml
           VAR: cluster=prod,team=${{ env.TEAM }}
           DEPLOY_SERVER: deploy.ssb.cloud.nais.io:443
+
