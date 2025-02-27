@@ -24,6 +24,9 @@ spec:
 
   accessPolicy:
     outbound:
+      rules:
+        - application: "stabil-id-lookup-service"
+          namespace: "reg-freg"
       external:
         - host: "auth.test.ssb.no"
         - host: "keycloak.staging-bip-app.ssb.no"
