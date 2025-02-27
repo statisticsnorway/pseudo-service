@@ -22,6 +22,9 @@ spec:
     - https://pseudo-service.intern.ssb.no
 
   accessPolicy:
+    rules:
+      - application: "stabil-id-lookup-service"
+        namespace: "reg-freg"
     outbound:
       external:
         - host: "auth.ssb.no"
