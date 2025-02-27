@@ -108,7 +108,7 @@ data:
 
         services:
           sid-service:
-            url: 'http://http://stabil-id-lookup-service.reg-freg.intern.test.ssb.no'
+            url: 'http://stabil-id-lookup-service.reg-freg.intern.test.ssb.no'
             path: '/v2'
             read-timeout: 60s
             pool:
