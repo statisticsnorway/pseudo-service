@@ -108,7 +108,7 @@ data:
 
         services:
           sid-service:
-            url: 'http://stabil-id-lookup-service.reg-freg.test.ssb.no:8080'
+            url: 'http://stabil-id-lookup-service.reg-freg'
             path: '/v2'
             read-timeout: 60s
             pool:
