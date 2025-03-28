@@ -180,7 +180,7 @@ data:
     gcp:
       kms:
         key-uris:
-          - ${PSEUDO_KEK_URI}
+          - "${PSEUDO_KEK_URI}"
           - "gcp-kms://dummy"
 
       http:
