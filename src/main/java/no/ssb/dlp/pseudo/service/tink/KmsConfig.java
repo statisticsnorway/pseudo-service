@@ -18,7 +18,7 @@ public class KmsConfig {
     /**
      * URIs to registered KMS KEKs (Key Encryption Keys)
      */
-    private List<String> keyUris = new ArrayList<>();
+    private List<URI> keyUris = new ArrayList<>();
 
     /**
      * Optional path to GCP credentials file (Service Account json). If not specified, the application will revert to
