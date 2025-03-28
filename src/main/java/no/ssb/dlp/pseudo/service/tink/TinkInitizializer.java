@@ -32,7 +32,7 @@ public class TinkInitizializer {
 
             log.info("Key URIS {}", Arrays.toString(kmsConfig.getKeyUris().toArray()));
             // Register Key Encryption Keys
-            for (URI keyUri : kmsConfig.getKeyUris()) {
+            for (URI keyUri : kmsConfig.getKeyUris().stream().map(URI::create).toList()) {
                 log.info("Register KMS key {}", keyUri);
                 GcpKmsClient.register(Optional.of(keyUri.toString()), Optional.ofNullable(kmsConfig.getCredentialsPath()));
             }
