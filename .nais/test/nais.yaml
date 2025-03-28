@@ -50,7 +50,7 @@ spec:
 
   env:
     - name: MICRONAUT_CONFIG_FILES
-      value: /conf/bootstrap-test.yml,/conf/application-test.yml
+      value: /conf/bootstrap-test.yml,/conf/application-test.yml,/conf/protected/app-roles.yml
     - name: LOGBACK_CONFIGURATION_FILE
       value: /conf/logback-test.xml
 
@@ -60,6 +60,8 @@ spec:
   filesFrom:
     - configmap: pseudo-application-test-configmap
       mountPath:  /conf
+    - configmap: pseudo-roles-test-configmap
+      mountPath:  /conf/protected
 
 ---
 
@@ -207,15 +209,3 @@ data:
       default-target-root: gs://ssb-staging-dapla-pseudo-service-data-export/felles
 
     sid.mapper.partition.size: 100000
-
-    app-roles:
-      # When using isAuthenticated() the JWT token must be signed by this trusted-issuer
-      trusted-issuers:
-        - https://keycloak.staging-bip-app.ssb.no/auth/realms/ssb
-        - https://auth.test.ssb.no/realms/ssb
-      users:
-        - isAuthenticated()
-      admins:
-        - isAuthenticated()
-      users-group: pseudo-service-user-t@ssb.no
-      admins-group: pseudo-service-admin-t@ssb.no

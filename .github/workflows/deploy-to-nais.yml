@@ -74,11 +74,33 @@ jobs:
       id-token: "write"
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.DAPLA_BOT_APP_ID }}
+          private-key: ${{ secrets.DAPLA_BOT_PRIVATE_KEY }}
+          owner: statisticsnorway
+          repositories: dapla-pseudo-iac
+
+      - uses: actions/checkout@v4
+        name: Retrieve protected configuration
+        with:
+          repository: "statisticsnorway/dapla-pseudo-iac"
+          path: "ext-config"
+          token: ${{ steps.app-token.outputs.token }}
+          sparse-checkout: |
+            apps/nais/pseudo-service/${{ inputs.cluster }}
+
+      - name: Configure environment variables
+        run: |
+          ext_config_dir="ext-config/apps/nais/pseudo-service/${{ inputs.cluster }}"
+          echo "ext_config=${ext_config_dir}" >> $GITHUB_ENV
       
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: ${{ inputs.cluster }}
-          RESOURCE: ${{ inputs.nais-config-path }}
+          RESOURCE: ${{ inputs.nais-config-path }},${{ env.ext_config }}/app-roles.yml
           VAR: image=${{ inputs.registry }}/${{ secrets.NAIS_MANAGEMENT_PROJECT_ID }}/${{ inputs.repository }}/${{ inputs.image-name }}:${{ inputs.image-tag }},team=dapla-stat
           DEPLOY_SERVER: deploy.ssb.cloud.nais.io:443
           REF: ${{ inputs.ref }}

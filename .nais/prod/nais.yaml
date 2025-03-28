@@ -46,7 +46,7 @@ spec:
 
   env:
     - name: MICRONAUT_CONFIG_FILES
-      value: /conf/bootstrap-prod.yml,/conf/application-prod.yml
+      value: /conf/bootstrap-prod.yml,/conf/application-prod.yml,/conf/protected/app-roles.yml
     - name: LOGBACK_CONFIGURATION_FILE
       value: /conf/logback-prod.xml
 
@@ -57,6 +57,8 @@ spec:
   filesFrom:
     - configmap: pseudo-application-prod-configmap
       mountPath:  /conf
+    - configmap: pseudo-roles-prod-configmap
+      mountPath:  /conf/protected
 
 ---
 
@@ -204,13 +206,3 @@ data:
       default-target-root: gs://ssb-prod-dapla-pseudo-service-data-export/felles
 
     sid.mapper.partition.size: 100000
-
-    app-roles:
-      # When using isAuthenticated() the JWT token must be signed by this trusted-issuer
-      trusted-issuers:
-        - https://keycloak.prod-bip-app.ssb.no/auth/realms/ssb
-        - https://auth.ssb.no/realms/ssb
-      users: ${PSEUDO_USERS}
-      # admins: ${PSEUDO_ADMINS}
-      users-group: pseudo-service-user-p@ssb.no
-      admins-group: pseudo-service-admin-p@ssb.no
