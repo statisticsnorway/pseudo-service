@@ -43,7 +43,7 @@ public class KeyService {
     }
 
     private URI getDefaultKekUri() {
-        return kmsConfig.getKeyUris().get(0);
+        return kmsConfig.getKeyUris().stream().map(URI::create).toList().get(0);
     }
 
     public static class UnsupportedKeyException extends RuntimeException {
