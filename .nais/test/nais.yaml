@@ -25,7 +25,7 @@ spec:
   accessPolicy:
     outbound:
       rules:
-        - application: "stabil-id-lookup-service"
+        - application: "stable-id-lookup-service"
           namespace: "reg-freg"
       external:
         - host: "auth.test.ssb.no"
@@ -110,7 +110,7 @@ data:
 
         services:
           sid-service:
-            url: 'http://stabil-id-lookup-service.reg-freg'
+            url: 'http://stable-id-lookup-service.reg-freg'
             path: '/v2'
             read-timeout: 60s
             pool:
