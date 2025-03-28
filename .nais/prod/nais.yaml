@@ -46,15 +46,15 @@ spec:
 
   env:
     - name: MICRONAUT_CONFIG_FILES
-      value: /conf/bootstrap-prod.yml,/conf/application-prod.yml,/conf/protected/app-roles.yml
+      value: /conf/bootstrap.yml,/conf/application.yml,/conf/protected/app-roles.yml
     - name: LOGBACK_CONFIGURATION_FILE
-      value: /conf/logback-prod.xml
+      value: /conf/logback.xml
 
   envFrom:
     - secret: pseudo-key-config
 
   filesFrom:
-    - configmap: pseudo-application-prod-configmap
+    - configmap: pseudo-application-configmap
       mountPath:  /conf
     - configmap: pseudo-roles-prod-configmap
       mountPath:  /conf/protected
@@ -64,12 +64,12 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: pseudo-application-prod-configmap
+  name: pseudo-application-configmap
   namespace: {{team}}
   labels:
     team: {{team}}
 data:
-  bootstrap-prod.yml: |-
+  bootstrap.yml: |-
     micronaut:
       application:
         name: pseudo-service
@@ -78,7 +78,7 @@ data:
     gcp:
       project-id: prod-dapla-pseudo-1530
 
-  application-prod.yml: |-
+  application.yml: |-
     micronaut:
       application:
         name: pseudo-service
