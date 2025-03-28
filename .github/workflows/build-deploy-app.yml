@@ -87,8 +87,8 @@ jobs:
             echo "nais_config_path=.nais/prod/nais.yaml" >> "$GITHUB_OUTPUT"
           else
             echo "nais_tag=${{ steps.docker-push.outputs.tag }}" >> "$GITHUB_OUTPUT"
-            echo "cluster=test" >> "$GITHUB_OUTPUT"
-            echo "nais_config_path=.nais/test/nais.yaml" >> "$GITHUB_OUTPUT"
+            echo "cluster=prod" >> "$GITHUB_OUTPUT"
+            echo "nais_config_path=.nais/prod/nais.yaml" >> "$GITHUB_OUTPUT"
           fi
       
   deploy:
