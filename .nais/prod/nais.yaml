@@ -22,10 +22,10 @@ spec:
     - https://pseudo-service.intern.ssb.no
 
   accessPolicy:
-    rules:
-      - application: "stable-id-lookup-service"
-        namespace: "reg-freg"
     outbound:
+      rules:
+        - application: "stable-id-lookup-service"
+          namespace: "reg-freg"
       external:
         - host: "auth.ssb.no"
         - host: "keycloak.prod-bip-app.ssb.no"

@@ -34,9 +34,6 @@ spec:
         - host: "secretmanager.googleapis.com"
         - host: "www.googleapis.com"
         - host: "cloudidentity.googleapis.com"
-        - host: "reg-freg-t-sid-lookup-service.staging-internal.ssb.no"
-          ports:
-          - port: 443
 
   liveness:
     path: /health/liveness
