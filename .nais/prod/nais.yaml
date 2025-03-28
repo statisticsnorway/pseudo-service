@@ -52,7 +52,6 @@ spec:
 
   envFrom:
     - secret: pseudo-key-config
-    - secret: pseudo-elevated-users
 
   filesFrom:
     - configmap: pseudo-application-prod-configmap
