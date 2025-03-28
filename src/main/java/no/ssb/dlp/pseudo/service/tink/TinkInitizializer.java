@@ -11,6 +11,7 @@ import no.ssb.dlp.pseudo.core.PseudoException;
 
 import jakarta.inject.Singleton;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Context
@@ -29,6 +30,7 @@ public class TinkInitizializer {
             log.info("Initialize Tink FPE");
             FpeConfig.register();
 
+            log.info("Key URIS {}", Arrays.toString(kmsConfig.getKeyUris().toArray()));
             // Register Key Encryption Keys
             for (URI keyUri : kmsConfig.getKeyUris()) {
                 log.info("Register KMS key {}", keyUri);
