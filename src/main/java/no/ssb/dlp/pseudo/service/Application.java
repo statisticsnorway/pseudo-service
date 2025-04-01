@@ -18,7 +18,11 @@ import lombok.extern.slf4j.Slf4j;
                 title = "Dapla Pseudo Service",
                 version = "1.0",
                 description = "Endpoints that support pseudonymization and depseudonymization of data and datasets",
-                contact = @Contact(url = "https://statistics-norway.atlassian.net/wiki/spaces/PSEUDO", name = "Team Skyinfrastruktur", email = "team-skyinfrastruktur@ssb.no")
+                contact = @Contact(
+                        url = "https://statistics-norway.atlassian.net/wiki/spaces/PSEUDO",
+                        name = "Team Statistikktjenester",
+                        email = "team-statistikktjenester@ssb.no"
+                )
         ),
         security = @SecurityRequirement(name = "Keycloak token"),
         servers = {

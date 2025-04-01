@@ -10,7 +10,7 @@ build-all: build-mvn build-docker ## Build all and create docker image
 
 .PHONY: build-mvn
 build-mvn: ## Build project and install to you local maven repo
-	./mvnw clean install -P ssb-bip
+	mvn clean install -Dmaven.test.skip
 
 .PHONY: build-docker
 build-docker: ## Build dev docker image
@@ -32,7 +32,7 @@ run-local: validate-local-config
 
 .PHONY: release-dryrun
 release-dryrun: ## Simulate a release in order to detect any issues
-	./mvnw release:prepare release:perform -Darguments="-Dmaven.deploy.skip=true" -DdryRun=true
+	mvn release:prepare release:perform -Darguments="-Dmaven.deploy.skip=true" -DdryRun=true
 
 .PHONY: release
 release: ## Release a new version. Update POMs and tag the new version in git
