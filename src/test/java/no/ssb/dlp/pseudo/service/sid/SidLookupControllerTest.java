@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 /**
  * Test of {@link SidLookupController} by mocking response from {@link SidClient}
  */
-//@MicronautTest
+@MicronautTest
 public class SidLookupControllerTest {
 
     @Inject
