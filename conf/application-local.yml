@@ -2,6 +2,7 @@ micronaut:
   application:
     name: my-pseudo-service
   server:
+    host: 127.0.0.1
     port: 10210
     cors:
       enabled: true
