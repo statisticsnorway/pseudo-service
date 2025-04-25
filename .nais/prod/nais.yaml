@@ -205,3 +205,4 @@ data:
       default-target-root: gs://ssb-prod-dapla-pseudo-service-data-export/felles
 
     sid.mapper.partition.size: 100000
+
