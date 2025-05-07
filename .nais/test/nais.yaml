@@ -31,7 +31,6 @@ spec:
           namespace: "reg-freg"
       external:
         - host: "auth.test.ssb.no"
-        - host: "keycloak.staging-bip-app.ssb.no"
         - host: "cloudkms.googleapis.com"
         - host: "secretmanager.googleapis.com"
         - host: "www.googleapis.com"
@@ -155,8 +154,6 @@ data:
               jwks:
                   keycloak-nais-test:
                     url: 'https://auth.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
-                  keycloak-bip-staging:
-                    url: 'https://keycloak.staging-bip-app.ssb.no/auth/realms/ssb/protocol/openid-connect/certs'
                   google:
                     url: 'https://www.googleapis.com/oauth2/v3/certs'
 
