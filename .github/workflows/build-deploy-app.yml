@@ -87,8 +87,8 @@ jobs:
             echo "nais_config_path=.nais/prod/nais.yaml" >> "$GITHUB_OUTPUT"
           else
             echo "nais_tag=${{ steps.docker-push.outputs.tag }}" >> "$GITHUB_OUTPUT"
-            echo "cluster=prod" >> "$GITHUB_OUTPUT"
-            echo "nais_config_path=.nais/prod/nais.yaml" >> "$GITHUB_OUTPUT"
+            echo "cluster=test" >> "$GITHUB_OUTPUT"
+            echo "nais_config_path=.nais/test/nais.yaml" >> "$GITHUB_OUTPUT"
           fi
       
   deploy:
@@ -102,4 +102,17 @@ jobs:
       image-tag: ${{ needs.build-push.outputs.nais-tag }}
       cluster: ${{needs.build-push.outputs.nais-cluster}}
       nais-config-path:  ${{needs.build-push.outputs.nais-config-path}}
+    secrets: inherit
+  
+  deploy_prod: # REMOVE WHEN MERGING NAIS DEPLOY
+    name: Deploy to NAIS
+    needs: build-push
+    uses: ./.github/workflows/deploy-to-nais.yml
+    with:
+      registry: europe-north1-docker.pkg.dev
+      repository: dapla-stat
+      image-name: pseudo-service
+      image-tag: ${{ needs.build-push.outputs.nais-tag }}
+      cluster: prod
+      nais-config-path:  .nais/prod/nais.yaml
     secrets: inherit
