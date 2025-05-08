@@ -168,6 +168,8 @@ data:
       info:
         enabled: true
         sensitive: false
+      health:
+        enabled: true
 
     logger:
       levels:
