@@ -40,13 +40,13 @@ spec:
 
   liveness:
     path: /health/liveness
-    port: "10220"
+    port: 10220
   readiness:
     path: /health/readiness
-    port: "10220"
+    port: 10220
   startup:
     path: /health/readiness
-    port: "10220"
+    port: 10220
   
   prometheus:
     enabled: true
