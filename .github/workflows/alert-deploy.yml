@@ -2,9 +2,6 @@ name: Deploy alerts
 run-name: Deploy alerts for Pseudo Service to test and prod
 
 on:
-  pull_request: ## ONLY FOR TESTING, SHOULD BE REMOVED AFTER DEPLOY PR IS MERGED
-    branches:
-      - master
   push:
     branches:
       - master
