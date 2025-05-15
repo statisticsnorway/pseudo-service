@@ -7,9 +7,10 @@ import io.micronaut.health.HealthStatus;
 import io.micronaut.management.health.indicator.HealthIndicator;
 import io.micronaut.management.health.indicator.HealthResult;
 import io.micronaut.management.health.indicator.annotation.Liveness;
+import jakarta.inject.Singleton;
 import reactor.core.publisher.Mono;
 
-@jakarta.inject.Singleton
+@Singleton
 @Liveness
 public class LivenessIndicator implements HealthIndicator {
     private static final String LIVENESS_NAME = "liveness";
