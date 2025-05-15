@@ -1,0 +1,65 @@
+name: Deploy alerts
+run-name: Deploy alerts for Pseudo Service to test and prod
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - ".nais/alerts.yaml"
+      - ".github/workflows/alert-deploy.yml"
+  workflow_dispatch:
+permissions:
+  id-token: write
+env:
+  TEAM: dapla-stat
+
+jobs:
+  test-deploy:
+    name: Deploy alerts to test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        name: Retrieve AlertManager configuration
+        with:
+          repository: "statisticsnorway/nais-alert-config"
+          path: "ext_alertconfig"
+          sparse-checkout: |
+            alertconfig.yaml
+          sparse-checkout-cone-mode: false
+
+      - name: Deploy to test
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: test
+          RESOURCE: .nais/alerts.yaml,ext_alertconfig/alertconfig.yaml
+          VAR: cluster=test,team=${{ env.TEAM }}
+          DEPLOY_SERVER: deploy.ssb.cloud.nais.io:443
+
+  prod-deploy:
+    name: Deploy alerts to prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        name: Retrieve AlertManager configuration
+        with:
+          repository: "statisticsnorway/nais-alert-config"
+          path: "ext_alertconfig"
+          sparse-checkout: |
+            alertconfig.yaml
+          sparse-checkout-cone-mode: false
+
+      - name: Deploy to prod
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: prod
+          RESOURCE: .nais/alerts.yaml,ext_alertconfig/alertconfig.yaml
+          VAR: cluster=prod,team=${{ env.TEAM }}
+          DEPLOY_SERVER: deploy.ssb.cloud.nais.io:443
+

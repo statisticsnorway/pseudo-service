@@ -1,0 +1,86 @@
+apiVersion: "monitoring.coreos.com/v1"
+kind: PrometheusRule
+metadata:
+  name: alert-pseudo-service
+  namespace: dapla-stat
+  labels:
+    team: dapla-stat
+    cluster: "{{cluster}}"
+spec:
+  groups:
+    - name: dapla-stat
+      rules:
+        # This alert checks if no replicas of pseudo-service are available, indicating the service is unavailable.
+        - alert: PseudoServiceUnavailable
+          expr: kube_deployment_status_replicas_available{deployment="pseudo-service"} == 0
+          for: 1m
+          annotations:
+            title: "Pseudo-service is unavailable"
+            consequence: "The service is unavailable to users. Immediate investigation required."
+            action: "Check the deployment status and logs for issues."
+          labels:
+            service: pseudo-service
+            namespace: dapla-stat
+            severity: critical
+            alertmanager_custom_config: dapla-stat
+            alert_type: custom
+
+        # This alert detects high CPU usage by calculating the CPU time used over 5 minutes.
+        - alert: HighCPUUsage
+          expr: rate(process_cpu_seconds_total{app="pseudo-service"}[5m]) > 0.8
+          for: 5m
+          annotations:
+            title: "High CPU usage detected"
+            consequence: "The service might experience performance degradation."
+            action: "Investigate the cause of high CPU usage and optimize if necessary."
+          labels:
+            service: pseudo-service
+            namespace: dapla-stat
+            severity: warning
+            alertmanager_custom_config: dapla-stat
+            alert_type: custom
+
+        # This alert checks if memory usage exceeds 90% of the 12GB limit, which could cause instability.
+        - alert: HighMemoryUsage
+          expr: sum by (namespace, pod) (container_memory_working_set_bytes{namespace="dapla-stat", pod=~"pseudo-service-.*"}) > 0.9 * sum by (namespace, pod) (kube_pod_container_resource_limits_memory_bytes{namespace="dapla-stat", pod=~"pseudo-service-.*"})
+          for: 5m
+          annotations:
+            title: "High memory usage detected"
+            consequence: "The service might experience instability due to high memory usage."
+            action: "Check memory utilization and consider increasing resources or optimizing the service."
+          labels:
+            service: pseudo-service
+            namespace: dapla-stat
+            severity: warning
+            alertmanager_custom_config: dapla-stat
+            alert_type: custom
+
+        # This alert detects a high number of error logs in pseudo-service.
+        - alert: HighNumberOfErrors
+          expr: (100 * sum by (app, namespace) (rate(log_messages_errors{app="pseudo-service", level=~"Error"}[3m])) / sum by (app, namespace) (rate(log_messages_total{app="pseudo-service"}[3m]))) > 10
+          for: 3m
+          annotations:
+            title: "High number of errors logged in pseudo-service"
+            consequence: "The application is logging a significant number of errors."
+            action: "Check the service logs for errors and address the root cause."
+          labels:
+            service: pseudo-service
+            namespace: dapla-stat
+            severity: critical
+            alertmanager_custom_config: dapla-stat
+            alert_type: custom
+
+        # This alert monitors the number of pod restarts for pseudo-service and triggers if more than 3 restarts occur within 15 minutes.
+        - alert: HighPodRestarts
+          expr: increase(kube_pod_container_status_restarts_total{namespace="dapla-stat", app="pseudo-service"}[15m]) > 3
+          for: 15m
+          annotations:
+            title: "High number of pod restarts"
+            consequence: "The service may be unstable or misconfigured."
+            action: "Investigate the cause of pod restarts and fix configuration or resource issues."
+          labels:
+            service: pseudo-service
+            namespace: dapla-stat
+            severity: warning
+            alertmanager_custom_config: dapla-stat
+            alert_type: custom
