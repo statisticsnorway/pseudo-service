@@ -40,13 +40,18 @@ spec:
 
   liveness:
     path: /health/liveness
-    port: 10210
+    port: 10220
   readiness:
     path: /health/readiness
-    port: 10210
+    port: 10220
   startup:
     path: /health/readiness
-    port: 10210
+    port: 10220
+  
+  prometheus:
+    enabled: true
+    path: /prometheus
+    port: 10220
 
   env:
     - name: MICRONAUT_CONFIG_FILES
