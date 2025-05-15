@@ -1,7 +1,4 @@
 on:
-  pull_request: ## ONLY FOR TESTING, SHOULD BE REMOVED AFTER DEPLOY PR IS MERGED
-    branches: 
-      - master
   push:
     branches:
       - master
@@ -102,17 +99,4 @@ jobs:
       image-tag: ${{ needs.build-push.outputs.nais-tag }}
       cluster: ${{needs.build-push.outputs.nais-cluster}}
       nais-config-path:  ${{needs.build-push.outputs.nais-config-path}}
-    secrets: inherit
-  
-  deploy_prod: # REMOVE WHEN MERGING NAIS DEPLOY
-    name: Deploy to NAIS
-    needs: build-push
-    uses: ./.github/workflows/deploy-to-nais.yml
-    with:
-      registry: europe-north1-docker.pkg.dev
-      repository: dapla-stat
-      image-name: pseudo-service
-      image-tag: ${{ needs.build-push.outputs.nais-tag }}
-      cluster: prod
-      nais-config-path:  .nais/prod/nais.yaml
     secrets: inherit

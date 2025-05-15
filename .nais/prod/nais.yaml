@@ -14,7 +14,7 @@ spec:
   port: 10210
   replicas:
     max: 10
-    min: 1
+    min: 2
   resources:
     requests:
       cpu: 300m
