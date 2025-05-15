@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>no.ssb.dapla.dlp.pseudo</groupId>
   <artifactId>pseudo-service</artifactId>
-  <version>3.1.12-SNAPSHOT</version>
+  <version>3.1.12</version>
   <name>pseudo-service</name>
 
   <parent>
@@ -45,7 +45,7 @@
   <scm>
     <developerConnection>scm:git:https://github.com/${github.repository}.git</developerConnection>
     <url>https://github.com/${github.repository}</url>
-    <tag>3.1.11</tag>
+    <tag>3.1.12</tag>
   </scm>
 
   <repositories>
