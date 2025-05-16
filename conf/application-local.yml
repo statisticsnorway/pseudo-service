@@ -27,12 +27,15 @@ micronaut:
         mapping: /api-docs/redoc/**
 
   security:
-    enabled: true
+    enabled: false
     intercept-url-map:
       - pattern: /api-docs/**
         httpMethod: GET
         access:
           - isAnonymous()
+      - pattern: /prometheus/**
+        http-method: GET
+        access: isAnonymous()
     authentication: bearer
     token:
       name-key: email
@@ -40,7 +43,7 @@ micronaut:
         signatures:
           jwks:
             keycloak-nais-test:
-                    url: 'https://auth.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
+              url: 'https://auth.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
             google:
               url: 'https://www.googleapis.com/oauth2/v3/certs'
 
@@ -60,6 +63,11 @@ endpoints:
   info:
     enabled: true
     sensitive: false
+  prometheus:
+    enabled: true
+    sensitive: false
+  monitor:
+    enabled: true
 
 logger:
   levels:
@@ -133,4 +141,3 @@ app-roles:
     - rpk@ssb.no
 
   admins-group: pseudo-service-user-dev@ssb.no
-
