@@ -123,12 +123,11 @@ data:
               max-connections: 50
             health-check: true
             health-check-interval: 15s
+            health-check-uri: /health/ready
           cloud-identity-service:
             url: 'https://cloudidentity.googleapis.com'
             path: '/v1'
             read-timeout: 60s
-            health-check: true
-            health-check-interval: 15s
 
       caches:
         secrets:
