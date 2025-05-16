@@ -27,7 +27,7 @@ micronaut:
         mapping: /api-docs/redoc/**
 
   security:
-    enabled: false
+    enabled: true
     intercept-url-map:
       - pattern: /api-docs/**
         httpMethod: GET
