@@ -1,5 +1,6 @@
 package no.ssb.dlp.pseudo.service.sid;
 
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.security.authentication.Authentication;
@@ -12,12 +13,13 @@ import no.ssb.dlp.pseudo.service.sid.local.SidCache;
 import no.ssb.dlp.pseudo.service.sid.local.SidReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
+
 
 import java.util.Optional;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -48,7 +50,7 @@ public class SidLookupControllerE2ETest {
     public void testLookupFnr(RequestSpecification spec) {
         Authentication user = Authentication.build("sherlock", Set.of(PseudoServiceRole.ADMIN));
         Optional<String> accessToken = tokenGenerator.generateToken(user, 10000);
-        assertTrue(accessToken.isPresent());
+        Assertions.assertTrue(accessToken.isPresent());
 
         spec.when().auth().oauth2(accessToken.get())
             .get("/sid/fnr/{fnr}", "11854898347")
@@ -61,7 +63,7 @@ public class SidLookupControllerE2ETest {
     public void testLookupSnr(RequestSpecification spec) {
         Authentication user = Authentication.build("sherlock", Set.of(PseudoServiceRole.ADMIN));
         Optional<String> accessToken = tokenGenerator.generateToken(user, 10000);
-        assertTrue(accessToken.isPresent());
+        Assertions.assertTrue(accessToken.isPresent());
 
         spec.when().auth().oauth2(accessToken.get())
                 .get("/sid/snr/{snr}", "0001ha3")

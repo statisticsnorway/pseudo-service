@@ -25,17 +25,20 @@ micronaut:
       redoc:
         paths: classpath:META-INF/swagger/views/redoc
         mapping: /api-docs/redoc/**
+  
+  metrics:
+    sensitive: false
+    enabled: true
+    tags:
+      application: ${micronaut.application.name}
+    export:
+      prometheus:
+        enabled: true
+        descriptions: true
+        step: PT1M
 
   security:
-    enabled: true
-    intercept-url-map:
-      - pattern: /api-docs/**
-        httpMethod: GET
-        access:
-          - isAnonymous()
-      - pattern: /prometheus/**
-        http-method: GET
-        access: isAnonymous()
+    enabled: false
     authentication: bearer
     token:
       name-key: email
@@ -60,6 +63,8 @@ micronaut:
         bucket: ssb-dev-dapla-pseudo-service-data-export
 
 endpoints:
+  all:
+    port: 10220
   info:
     enabled: true
     sensitive: false
@@ -68,9 +73,13 @@ endpoints:
     sensitive: false
   monitor:
     enabled: true
+  routes:
+    enabled: true
+    sensitive: false
 
 logger:
   levels:
+    root: DEBUG
     io.micronaut.security: INFO
     no.ssb.dlp.pseudo.service: DEBUG
 
