@@ -1,6 +1,5 @@
 package no.ssb.dlp.pseudo.service.sid;
 
-import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.security.authentication.Authentication;
