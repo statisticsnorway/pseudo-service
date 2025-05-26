@@ -12,7 +12,6 @@ import no.ssb.dapla.dlp.pseudo.func.map.MapFuncConfig;
 import no.ssb.dapla.dlp.pseudo.func.map.Mapper;
 import no.ssb.dlp.pseudo.service.Application;
 import org.apache.groovy.util.Maps;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -110,7 +109,7 @@ public class SidMapperTest {
             application.when(Application::getContext).thenReturn(context);
             Mapper mapper = ServiceLoader.load(Mapper.class).findFirst().orElseThrow(() ->
                     new RuntimeException("SidMapper class not found"));
-            Exception exception = Assert.assertThrows(RuntimeException.class, () -> {
+            Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
                 mapper.setConfig(Map.of("snapshotDate", "2005-02-27"));
             });
             Assertions.assertEquals("Requested date is of an earlier date than all available SID dates. Valid dates are: 2023-04-25", exception.getMessage());
@@ -126,7 +125,7 @@ public class SidMapperTest {
             application.when(Application::getContext).thenReturn(context);
             Mapper mapper = ServiceLoader.load(Mapper.class).findFirst().orElseThrow(() ->
                     new RuntimeException("SidMapper class not found"));
-            Exception exception = Assert.assertThrows(RuntimeException.class, () -> {
+            Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
                 mapper.setConfig(Map.of("snapshotDate", "25-04-2023"));
             });
             Assertions.assertEquals("Invalid snapshot date format. Valid dates are: 2023-04-25", exception.getMessage());

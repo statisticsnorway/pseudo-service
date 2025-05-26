@@ -11,7 +11,6 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import no.ssb.dlp.pseudo.service.security.PseudoServiceRole;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

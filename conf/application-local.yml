@@ -25,6 +25,17 @@ micronaut:
       redoc:
         paths: classpath:META-INF/swagger/views/redoc
         mapping: /api-docs/redoc/**
+  
+  metrics:
+    sensitive: false
+    enabled: true
+    tags:
+      application: ${micronaut.application.name}
+    export:
+      prometheus:
+        enabled: true
+        descriptions: true
+        step: PT1M
 
   security:
     enabled: true
@@ -60,6 +71,8 @@ micronaut:
         bucket: ssb-dev-dapla-pseudo-service-data-export
 
 endpoints:
+  all:
+    port: 10220
   info:
     enabled: true
     sensitive: false
@@ -68,6 +81,9 @@ endpoints:
     sensitive: false
   monitor:
     enabled: true
+  routes:
+    enabled: true
+    sensitive: false
 
 logger:
   levels:
