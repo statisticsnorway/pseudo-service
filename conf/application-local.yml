@@ -38,7 +38,15 @@ micronaut:
         step: PT1M
 
   security:
-    enabled: false
+    enabled: true
+    intercept-url-map:
+      - pattern: /api-docs/**
+        httpMethod: GET
+        access:
+          - isAnonymous()
+      - pattern: /prometheus/**
+        http-method: GET
+        access: isAnonymous()
     authentication: bearer
     token:
       name-key: email
@@ -79,7 +87,6 @@ endpoints:
 
 logger:
   levels:
-    root: DEBUG
     io.micronaut.security: INFO
     no.ssb.dlp.pseudo.service: DEBUG
 
