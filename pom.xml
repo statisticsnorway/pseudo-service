@@ -21,8 +21,7 @@
     <dapla-artifact-registry.url>artifactregistry://europe-north1-maven.pkg.dev/artifact-registry-5n/dapla-pseudo-maven</dapla-artifact-registry.url>
     <github.repository>statisticsnorway/pseudo-service</github.repository>
     <exec.mainClass>no.ssb.dlp.pseudo.service.Application</exec.mainClass>
-    <dapla-datadoc-model.version>1.2</dapla-datadoc-model.version>
-
+    <dapla-datadoc-model.version>1.4-SNAPSHOT</dapla-datadoc-model.version>
     <artifactregistry-maven-wagon.version>2.2.1</artifactregistry-maven-wagon.version>
     <dapla-dlp-pseudo-core.version>2.0.6</dapla-dlp-pseudo-core.version>
     <micronaut.version>4.3.7</micronaut.version>
@@ -622,6 +621,19 @@
           <url>https://maven.pkg.github.com/${github.repository}</url>
         </repository>
       </distributionManagement>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+          <id>github</id>
+          <url>https://maven.pkg.github.com/statisticsnorway/ssb-datadoc-model</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
     </profile>
     <profile>
       <id>dapla-artifact-registry</id>

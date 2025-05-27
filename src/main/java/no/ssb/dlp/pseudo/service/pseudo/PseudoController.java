@@ -80,12 +80,18 @@ public class PseudoController {
         log.info(Strings.padEnd(String.format("*** Pseudonymize field: %s ", req.getName()), 80, '*'));
         PseudoField pseudoField = new PseudoField(req.getName(), req.getPattern(), req.getPseudoFunc(), req.getKeyset());
         try {
-
             final String correlationId = MDC.get("CorrelationID");
 
-            return HttpResponse.ok(pseudoField.process(pseudoConfigSplitter,
-                    recordProcessorFactory, req.values, PseudoOperation.PSEUDONYMIZE, correlationId)
-                            .map(o -> o.getBytes(StandardCharsets.UTF_8)))
+            return HttpResponse.ok(
+                    pseudoField.process(
+                            pseudoConfigSplitter,
+                            recordProcessorFactory,
+                            req.values,
+                            PseudoOperation.PSEUDONYMIZE,
+                            correlationId
+                            )
+                            .map(o -> o.getBytes(StandardCharsets.UTF_8))
+                    )
                     .characterEncoding(StandardCharsets.UTF_8);
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
