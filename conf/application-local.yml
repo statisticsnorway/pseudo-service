@@ -41,13 +41,12 @@ micronaut:
     enabled: true
     intercept-url-map:
       - pattern: /api-docs/**
-        httpMethod: GET
+        http-method: GET
         access:
           - isAnonymous()
       - pattern: /prometheus/**
         http-method: GET
         access: isAnonymous()
-    authentication: bearer
     token:
       name-key: email
       jwt:
