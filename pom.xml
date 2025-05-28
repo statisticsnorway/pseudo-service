@@ -368,6 +368,7 @@
               <path>
                 <groupId>io.micronaut.security</groupId>
                 <artifactId>micronaut-security-annotations</artifactId>
+                <version>${micronaut.security.version}</version>
                 <exclusions>
                   <exclusion>
                     <groupId>io.micronaut</groupId>
@@ -435,6 +436,7 @@
                   <path>
                     <groupId>io.micronaut.security</groupId>
                     <artifactId>micronaut-security-annotations</artifactId>
+                    <version>${micronaut.security.version}</version>
                   </path>
                 </annotationProcessorPaths>
               </configuration>
