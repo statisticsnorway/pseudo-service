@@ -39,8 +39,8 @@ jobs:
             [
               {
                 "id": "github",
-                "username": ${{ github.actor }},
-                "password": ${{ secrets.GITHUB_TOKEN }},
+                "username": "${{ github.actor }}",
+                "password": "${{ secrets.GITHUB_TOKEN }}",
                 "configuration": {
                   "httpHeaders": {
                     "property": {
