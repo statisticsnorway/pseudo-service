@@ -68,4 +68,7 @@ jobs:
           password: "${{ steps.auth.outputs.access_token }}"
 
       - name: Maven build and install
-        run: mvn --batch-mode clean install
+        shell: bash
+        run: |
+          cat ~/.m2/settings.xml
+          mvn --batch-mode clean install
