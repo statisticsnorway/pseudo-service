@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
         ),
         security = @SecurityRequirement(name = "Keycloak token"),
         servers = {
-                @Server(url = "https://auth.test.ssb.no", description = "Test"),
+                @Server(url = "https://pseudo-service.test.ssb.no", description = "Test"),
                 @Server(url = "http://localhost:10210", description = "Locally proxied pseudo service")
         }
 )

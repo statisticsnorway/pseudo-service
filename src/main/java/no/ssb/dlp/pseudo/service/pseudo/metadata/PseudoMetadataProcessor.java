@@ -2,6 +2,7 @@ package no.ssb.dlp.pseudo.service.pseudo.metadata;
 
 import io.reactivex.processors.ReplayProcessor;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import no.ssb.dlp.pseudo.core.util.Json;
 import org.reactivestreams.Publisher;
 
@@ -35,7 +36,7 @@ public class PseudoMetadataProcessor {
         metrics.onNext(fieldMetric);
     }
     public Publisher<String> getMetadata() {
-        return datadocMetadata.map(FieldMetadata::toDatadocPseudoVariable).map(Json::from);
+        return datadocMetadata.map(FieldMetadata::toDatadocVariable).map(Json::from);
     }
     public Publisher<String> getLogs() {
         return logs.map(Json::from);
