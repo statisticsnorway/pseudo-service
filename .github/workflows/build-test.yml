@@ -35,20 +35,20 @@ jobs:
         id: maven_settings
         with:
           override: true
-          servers: |
-            [
-              {
-                "id": "github",
-                "configuration": {
-                  "httpHeaders": {
-                    "property": {
-                      "name": "Authorization",
-                      "value": "Bearer ${{ secrets.GITHUB_TOKEN }}"
-                    }
-                  }
-                }
-              }
-            ]
+#          servers: |
+#            [
+#              {
+#                "id": "github",
+#                "configuration": {
+#                  "httpHeaders": {
+#                    "property": {
+#                      "name": "Authorization",
+#                      "value": "Bearer ${{ secrets.GITHUB_TOKEN }}"
+#                    }
+#                  }
+#                }
+#              }
+#            ]
 
       - name: Authenticate to Google Cloud
         id: auth
