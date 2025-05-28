@@ -25,7 +25,8 @@ public class FieldMetadata {
     boolean stableIdentifierType;
     Map<String, String> encryptionAlgorithmParameters;
 
-    public Variable toDatadocPseudoVariable() {
+    // Create a partial datadoc variable which only contains pseudonymization information
+    public Variable toDatadocVariable() {
         final var pseudonymization =
                 Pseudonymization.builder()
                 .withEncryptionAlgorithm(encryptionAlgorithm)
@@ -40,6 +41,12 @@ public class FieldMetadata {
                 .withShortName(shortName)
                 .withDataElementPath(dataElementPath)
                 .withPseudonymization(pseudonymization)
+                // we explicitly set these keys to 'null' so that their keys don't show up in the serialized json object
+                .withName(null)
+                .withPopulationDescription(null)
+                .withComment(null)
+                .withInvalidValueDescription(null)
+                .withCustomType(null)
                 .build();
     }
 
