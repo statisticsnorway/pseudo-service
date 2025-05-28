@@ -19,6 +19,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dapla-artifact-registry.url>artifactregistry://europe-north1-maven.pkg.dev/artifact-registry-5n/dapla-pseudo-maven</dapla-artifact-registry.url>
+    <ssb-datadoc-model.url>https://maven.pkg.github.com/statisticsnorway/ssb-datadoc-model</ssb-datadoc-model.url>
     <github.repository>statisticsnorway/pseudo-service</github.repository>
     <exec.mainClass>no.ssb.dlp.pseudo.service.Application</exec.mainClass>
     <dapla-datadoc-model.version>1.4-SNAPSHOT</dapla-datadoc-model.version>
@@ -59,6 +60,20 @@
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <!--
+      GitHub maven registry packages require authentication.
+      This needs to be configured in the users ~/.m2/settings.xml
+      as a <server> with a corresponding ssb-datadoc-model id.
+      -->
+      <id>ssb-datadoc-model</id>
+      <name>SSB Datadoc package</name>
+      <url>https://maven.pkg.github.com/statisticsnorway/ssb-datadoc-model</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
@@ -621,19 +636,6 @@
           <url>https://maven.pkg.github.com/${github.repository}</url>
         </repository>
       </distributionManagement>
-      <repositories>
-        <repository>
-          <id>central</id>
-          <url>https://repo1.maven.org/maven2</url>
-        </repository>
-        <repository>
-          <id>github</id>
-          <url>https://maven.pkg.github.com/statisticsnorway/ssb-datadoc-model</url>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
     </profile>
     <profile>
       <id>dapla-artifact-registry</id>
