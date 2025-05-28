@@ -29,18 +29,16 @@ jobs:
           java-version: 21
           distribution: temurin
           cache: maven
-          server-id: github
 
       - name: Setup Maven authentication to GitHub packages
         uses: s4u/maven-settings-action@v3.1.0
         id: maven_settings
         with:
+          override: true
           servers: |
             [
               {
                 "id": "github",
-                "username": "${{ github.actor }}",
-                "password": "${{ secrets.GITHUB_TOKEN }}",
                 "configuration": {
                   "httpHeaders": {
                     "property": {
