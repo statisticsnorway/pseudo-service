@@ -69,4 +69,4 @@ jobs:
         shell: bash
         run: |
           cat ~/.m2/settings.xml
-          mvn --batch-mode clean install
+          mvn --quiet --batch-mode clean install
