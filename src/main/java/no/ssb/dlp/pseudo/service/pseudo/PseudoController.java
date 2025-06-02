@@ -51,6 +51,13 @@ import java.nio.file.Path;
 import java.security.Principal;
 import java.util.List;
 
+/*
+TODO: Once file based endpoints are removed implement DTOs for the response type of remaining endpoints
+  so that we can give accurate swagger documentation for the response json using the annotation
+  @ApiResponse(content = @Content(schema = @Schema(implementation= DTO.class)))
+  on each endpoint handler method.
+ */
+
 @RequiredArgsConstructor
 @Controller
 @Slf4j
@@ -69,6 +76,7 @@ public class PseudoController {
      * @param request JSON string representing a {@link PseudoFieldRequest} object.
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
+
     @Operation(summary = "Pseudonymize field", description = "Pseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Post(value = "/pseudonymize/field", consumes = MediaType.APPLICATION_JSON)
