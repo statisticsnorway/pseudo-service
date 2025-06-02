@@ -30,14 +30,8 @@ release-dryrun                 Simulate a release in order to detect any issues
 
 ### Release
 
-Release a new version of the package by pushing the newest changes on `master`
-to the `release` branch. This should trigger a workflow that performs
-the necessary version bumps and deploys to NAIS prod.
-
-```bash
-git checkout master
-git pull
-git checkout release
-git merge master
-git push
-```
+Release a new version of the package by running `make release`. This command
+pushes the current state of `origin/master` *as well as* locally
+committed changes to the `release` branch. This starts a workflow
+that performs a minor version bump, a GitHub release, and a deployment
+to the NAIS production environment.
