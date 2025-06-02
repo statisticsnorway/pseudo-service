@@ -25,7 +25,7 @@ build-mvn                      Build project and install to you local maven repo
 build-docker                   Build dev docker image
 init-local-config              Creates configuration files in the local directory
 run-local                      Run the app locally (without docker)
-release-dryrun                 Simulate a release in order to detect any issues
+release                        Release a new version. Update POMs and tag the new version in git
 ```
 
 ### Release
