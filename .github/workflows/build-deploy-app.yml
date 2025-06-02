@@ -35,6 +35,20 @@ jobs:
           distribution: temurin
           cache: maven
 
+      - name: Setup Maven authentication to GitHub packages
+        uses: s4u/maven-settings-action@v3.1.0
+        id: maven_settings
+        with:
+          override: true
+          servers: |
+              [
+                {
+                  "id": "ssb-datadoc-model",
+                  "username": "${{ github.actor }}",
+                  "password": "${{ secrets.GITHUB_TOKEN }}"
+                }
+              ]
+
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
@@ -53,9 +67,9 @@ jobs:
       - name: Maven build and install
         run: |
           if [[ ${{github.event_name}} == "release" ]]; then
-            mvn --batch-mode clean package
+            mvn --quiet --batch-mode clean package
           else
-            mvn --batch-mode -P dapla-artifact-registry deploy
+            mvn --quiet --batch-mode -P dapla-artifact-registry deploy
           fi
       
       - name: Add optional extra tag

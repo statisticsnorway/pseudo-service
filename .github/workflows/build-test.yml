@@ -61,6 +61,4 @@ jobs:
 
       - name: Maven build and install
         shell: bash
-        run: |
-          cat ~/.m2/settings.xml
-          mvn --quiet --batch-mode clean install
+        run: mvn --quiet --batch-mode clean install
