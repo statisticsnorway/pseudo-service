@@ -30,13 +30,14 @@ validate-local-config: ## Validate and echo local app config
 run-local: validate-local-config
 	java ${JAVA_OPTS} --enable-preview -Dmicronaut.config.files=conf/application-local.yml  -Dmicronaut.environments=local,local-sid -jar target/pseudo-service-*-SNAPSHOT.jar
 
-.PHONY: release-dryrun
-release-dryrun: ## Simulate a release in order to detect any issues
-	mvn release:prepare release:perform -Darguments="-Dmaven.deploy.skip=true" -DdryRun=true
-
 .PHONY: release
-release: ## Release a new version. Update POMs and tag the new version in git
-	git push origin master:release
+release:
+	@set -e ; \
+	git checkout master && \
+	git pull && \
+	git checkout release && \
+	git merge master && \
+	git push
 
 .PHONY: help
 help:
