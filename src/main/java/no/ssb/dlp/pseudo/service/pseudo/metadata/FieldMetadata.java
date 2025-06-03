@@ -18,7 +18,6 @@ public class FieldMetadata {
 
     String shortName;
     String dataElementPath;
-    String dataElementPattern;
     String encryptionKeyReference;
     String encryptionAlgorithm;
     String stableIdentifierVersion;

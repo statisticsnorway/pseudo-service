@@ -42,7 +42,6 @@ class RepseudoFieldTest {
         processor.addMetadata(FieldMetadata.builder()
                 .shortName("shortName")
                 .dataElementPath("path")
-                .dataElementPattern("pattern")
                 .encryptionKeyReference("pattern")
                 .encryptionAlgorithm("algorithm")
                 .encryptionAlgorithmParameters(Map.of("key", "value"))

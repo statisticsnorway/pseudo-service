@@ -2,7 +2,6 @@ package no.ssb.dlp.pseudo.service.pseudo.metadata;
 
 import io.reactivex.processors.ReplayProcessor;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
 import no.ssb.dlp.pseudo.core.util.Json;
 import org.reactivestreams.Publisher;
 
