@@ -39,13 +39,18 @@ spec:
 
   liveness:
     path: /health/liveness
-    port: 10210
+    port: 10220
   readiness:
     path: /health/readiness
-    port: 10210
+    port: 10220
   startup:
     path: /health/readiness
-    port: 10210
+    port: 10220
+  
+  prometheus:
+    enabled: true
+    path: /prometheus
+    port: "10220"
 
   env:
     - name: MICRONAUT_CONFIG_FILES
@@ -115,10 +120,24 @@ data:
             pool:
               enabled: true
               max-connections: 50
+            health-check: true
+            health-check-interval: 15s
+            health-check-uri: /health/ready
           cloud-identity-service:
             url: 'https://cloudidentity.googleapis.com'
             path: '/v1'
             read-timeout: 60s
+
+      metrics:
+        sensitive: false
+        enabled: true
+        tags:
+          application: ${micronaut.application.name}
+        export:
+          prometheus:
+            enabled: true
+            descriptions: true
+            step: PT1M
 
       caches:
         secrets:
@@ -146,8 +165,19 @@ data:
         intercept-url-map:
           - pattern: /api-docs/**
             httpMethod: GET
-            access:
-              - isAnonymous()
+            access: isAnonymous()
+          - pattern: /health/**
+            http-method: GET
+            access: isAnonymous()
+          - pattern: /metrics/**
+            http-method: GET
+            access: isAnonymous()
+          - pattern: /prometheus/**
+            http-method: GET
+            access: isAnonymous()
+          - pattern: /**
+            access: isAuthenticated()
+
         token:
           name-key: email
           jwt:
@@ -162,13 +192,18 @@ data:
           enabled: false
 
     endpoints:
+      all:
+        port: 10220
       prometheus:
         sensitive: false
       info:
         enabled: true
         sensitive: false
       health:
-        enabled: true
+        sensitive: false
+        details-visible: ANONYMOUS
+        monitor:
+          enabled: true
 
     logger:
       levels:
