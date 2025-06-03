@@ -120,6 +120,9 @@ jobs:
   alert:
     name: alert
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     needs: [ build-push, deploy ]
     if: ${{ failure() }}
     
