@@ -186,6 +186,8 @@ data:
               jwks:
                   keycloak-nais-test:
                     url: 'https://auth.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
+                  keycloak-nais-dev:
+                    url: https://auth-play.test.ssb.no/realms/ssb/protocol/openid-connect/certs
                   google:
                     url: 'https://www.googleapis.com/oauth2/v3/certs'
 
