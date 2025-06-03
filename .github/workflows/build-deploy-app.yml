@@ -116,3 +116,63 @@ jobs:
       cluster: ${{needs.build-push.outputs.nais-cluster}}
       nais-config-path:  ${{needs.build-push.outputs.nais-config-path}}
     secrets: inherit
+  
+  alert:
+    name: alert
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    needs: [ build-push, deploy ]
+    if: ${{ failure() }}
+    
+    steps:
+    - name: Set env variables
+      run: |
+        echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+
+        if [[ ${{github.event_name}} == "release" ]]; then
+          echo "environment=prod" >> "$GITHUB_ENV"
+          echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL_PROD }}" >> $GITHUB_ENV
+        else
+          echo "environment=test" >> "$GITHUB_ENV"
+          echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL_TEST }}" >> $GITHUB_ENV
+
+    - name: Send custom JSON data to Slack workflow
+      id: slack
+      uses: slackapi/slack-github-action@v1.25.0
+      with:
+        payload: |
+          {
+            "text": "The build or deploy of Pseudo Service failed",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                "type": "mrkdwn",
+                "text": "❗️❗️The build or deploy of Pseudo Service in the ${{env.environment}} environment at time ${{env.NOW}} has failed❗️❗️"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "See the workflow logs"
+                },
+                "accessory": {
+                  "type": "button",
+                  "text": {
+                  "type": "plain_text",
+                    "text": "Go to workflow",
+                    "emoji": true
+                  },
+                  "style": "primary",
+                  "value": "workflow_button",
+                  "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                  "action_id": "button-action"
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
