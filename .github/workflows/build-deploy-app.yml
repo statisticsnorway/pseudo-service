@@ -137,6 +137,7 @@ jobs:
         else
           echo "environment=test" >> "$GITHUB_ENV"
           echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL_TEST }}" >> $GITHUB_ENV
+        fi
 
     - name: Send custom JSON data to Slack workflow
       id: slack
