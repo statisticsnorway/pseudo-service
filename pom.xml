@@ -19,10 +19,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dapla-artifact-registry.url>artifactregistry://europe-north1-maven.pkg.dev/artifact-registry-5n/dapla-pseudo-maven</dapla-artifact-registry.url>
+    <ssb-datadoc-model.url>https://maven.pkg.github.com/statisticsnorway/ssb-datadoc-model</ssb-datadoc-model.url>
     <github.repository>statisticsnorway/pseudo-service</github.repository>
     <exec.mainClass>no.ssb.dlp.pseudo.service.Application</exec.mainClass>
-    <dapla-datadoc-model.version>1.2</dapla-datadoc-model.version>
-
+    <dapla-datadoc-model.version>1.4</dapla-datadoc-model.version>
     <artifactregistry-maven-wagon.version>2.2.1</artifactregistry-maven-wagon.version>
     <dapla-dlp-pseudo-core.version>2.0.6</dapla-dlp-pseudo-core.version>
     <micronaut.version>4.7.6</micronaut.version>
@@ -60,6 +60,20 @@
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <!--
+      GitHub maven registry packages require authentication.
+      This needs to be configured in the users ~/.m2/settings.xml
+      as a <server> with a corresponding ssb-datadoc-model id.
+      -->
+      <id>ssb-datadoc-model</id>
+      <name>SSB Datadoc package</name>
+      <url>https://maven.pkg.github.com/statisticsnorway/ssb-datadoc-model</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>

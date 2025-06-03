@@ -29,7 +29,21 @@ jobs:
           java-version: 21
           distribution: temurin
           cache: maven
-      
+
+      - name: Setup Maven authentication to GitHub packages
+        uses: s4u/maven-settings-action@v3.1.0
+        id: maven_settings
+        with:
+          override: true
+          servers: |
+            [
+              {
+                "id": "ssb-datadoc-model",
+                "username": "${{ github.actor }}",
+                "password": "${{ secrets.GITHUB_TOKEN }}"
+              }
+            ]
+
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
@@ -44,6 +58,7 @@ jobs:
           registry: ${{ env.DAPLA_REGISTRY }}
           username: "oauth2accesstoken"
           password: "${{ steps.auth.outputs.access_token }}"
-      
+
       - name: Maven build and install
-        run: mvn --batch-mode clean install
+        shell: bash
+        run: mvn --quiet --batch-mode clean install

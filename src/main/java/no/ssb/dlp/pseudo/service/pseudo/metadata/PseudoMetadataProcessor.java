@@ -35,7 +35,7 @@ public class PseudoMetadataProcessor {
         metrics.onNext(fieldMetric);
     }
     public Publisher<String> getMetadata() {
-        return datadocMetadata.map(FieldMetadata::toDatadocPseudoVariable).map(Json::from);
+        return datadocMetadata.map(FieldMetadata::toDatadocVariable).map(Json::from);
     }
     public Publisher<String> getLogs() {
         return logs.map(Json::from);

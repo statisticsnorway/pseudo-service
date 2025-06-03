@@ -51,6 +51,12 @@ import java.nio.file.Path;
 import java.security.Principal;
 import java.util.List;
 
+/*
+TODO: Once file based endpoints are removed implement data classes for the response type of remaining endpoints
+  so that we can provide accurate swagger documentation.
+  See https://github.com/statisticsnorway/pseudo-service/issues/95
+ */
+
 @RequiredArgsConstructor
 @Controller
 @Slf4j
@@ -69,6 +75,7 @@ public class PseudoController {
      * @param request JSON string representing a {@link PseudoFieldRequest} object.
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
+
     @Operation(summary = "Pseudonymize field", description = "Pseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Post(value = "/pseudonymize/field", consumes = MediaType.APPLICATION_JSON)
@@ -80,12 +87,18 @@ public class PseudoController {
         log.info(Strings.padEnd(String.format("*** Pseudonymize field: %s ", req.getName()), 80, '*'));
         PseudoField pseudoField = new PseudoField(req.getName(), req.getPattern(), req.getPseudoFunc(), req.getKeyset());
         try {
-
             final String correlationId = MDC.get("CorrelationID");
 
-            return HttpResponse.ok(pseudoField.process(pseudoConfigSplitter,
-                    recordProcessorFactory, req.values, PseudoOperation.PSEUDONYMIZE, correlationId)
-                            .map(o -> o.getBytes(StandardCharsets.UTF_8)))
+            return HttpResponse.ok(
+                    pseudoField.process(
+                            pseudoConfigSplitter,
+                            recordProcessorFactory,
+                            req.values,
+                            PseudoOperation.PSEUDONYMIZE,
+                            correlationId
+                            )
+                            .map(o -> o.getBytes(StandardCharsets.UTF_8))
+                    )
                     .characterEncoding(StandardCharsets.UTF_8);
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
@@ -155,21 +168,21 @@ public class PseudoController {
 
     @Operation(summary = "Pseudonymize file", description = """
             Pseudonymize a file (JSON or CSV - or a zip with potentially multiple such files) by uploading the file.
-                        
+            
             The pseudonymized result will be streamed back.
-                        
+            
             Notice that you can specify the `targetContentType` if you want to convert to either of the supported file
             formats. E.g. your source could be a CSV file and the result could be a JSON file.
 
             Reduce transmission times by applying compression both to the source and target files.
             Specify `compression` if you want the result to be a zipped (and optionally) encrypted archive.
-                        
+            
             Pseudonymization will be applied according to a list of "rules" that target the fields of the file being
             processed. Each rule defines a `pattern` (according to [glob pattern matching](https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob))
             that identifies one or multiple fields, and a `func` that will be applied to the matching fields. Rules are
             processed in the order they are defined, and only the first matching rule will be applied (thus: rule ordering
             is important).
-                        
+            
             Pseudo rules will most times refer to crypto keys. You can provide your own keys to use (via the `keysets` param)
             or use one of the predefined keys: `ssb-common-key-1` or `ssb-common-key-2`.
             """
@@ -372,7 +385,7 @@ public class PseudoController {
         log.debug("Receive file - stored temporarily at " + tempFile.getAbsolutePath());
         return Single.fromPublisher(data.transferTo(tempFile))
                 .map(success -> {
-                    if (Boolean.TRUE.equals(success)) {
+                    if (success) {
                         return tempFile;
                     } else {
                         throw new RuntimeException("Error receiving file " + tempFile);

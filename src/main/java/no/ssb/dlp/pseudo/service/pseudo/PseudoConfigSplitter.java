@@ -16,7 +16,7 @@ import static no.ssb.dlp.pseudo.core.func.PseudoFuncNames.MAP_SID;
  * Split a PseudoConfig into multiple PseudoConfig objects to support chaining of SID Mapping functions.
  *
  * Disclaimer: This is a stop gap "solution", used to support chaining of SID Mapping with pseudonymization.
- * The API contract could be changed to support multiple PseudoConfig transformations, but we need to think more aobut
+ * The API contract could be changed to support multiple PseudoConfig transformations, but we need to think more about
  * exactly how this should be expressed.
  *
  * @deprecated This class will be removed after the SID Mapping function is rewritten
