@@ -51,7 +51,7 @@ spec:
   prometheus:
     enabled: true
     path: /prometheus
-    port: "10220"
+    port: 10220
 
   env:
     - name: MICRONAUT_CONFIG_FILES
