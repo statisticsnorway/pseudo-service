@@ -49,7 +49,7 @@ class PseudoResponseSerializerTest {
                        }
                      ],
                      "datadoc_metadata": {
-                       "variables": [
+                       "pseudo_variables": [
                          {
                            "variable_descriptions": {
                              "name": {
