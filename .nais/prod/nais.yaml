@@ -18,7 +18,8 @@ spec:
   resources:
     requests:
       cpu: 300m
-      memory: 12Gi
+      memory: 12Gi  # This should be equal to the upper limit of the app, as Kubernetes
+                    # pods are only guaranteed to get the resources defined in "requests"
     limits:
       memory: 12Gi
 
