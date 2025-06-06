@@ -12,6 +12,7 @@ metadata:
 spec:
   image: "{{ image }}"  # Injected from the GitHub Action
   port: 10210
+  terminationGracePeriodSeconds: 180
   replicas:
     max: 10
     min: 2
