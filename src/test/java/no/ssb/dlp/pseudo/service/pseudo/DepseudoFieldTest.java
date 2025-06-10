@@ -44,7 +44,6 @@ class DepseudoFieldTest {
         processor.addMetadata(FieldMetadata.builder()
                 .shortName("shortName")
                 .dataElementPath("path")
-                .dataElementPattern("pattern")
                 .encryptionKeyReference("pattern")
                 .encryptionAlgorithm("algorithm")
                 .encryptionAlgorithmParameters(Map.of("key", "value"))
@@ -79,20 +78,21 @@ class DepseudoFieldTest {
                        "processedValue v2"
                      ],
                      "datadoc_metadata": {
-                        "pseudo_variables": [
+                        "variables": [
                            {
                              "short_name": "shortName",
                              "data_element_path": "path",
-                             "data_element_pattern": "pattern",
-                             "encryption_key_reference": "pattern",
-                             "encryption_algorithm": "algorithm",
-                             "stable_identifier_version": "stableIdVersion",
-                             "stable_identifier_type": "FREG_SNR",
-                              "encryption_algorithm_parameters": [
-                                {
-                                  "key": "value"
-                                }
-                              ]
+                             "pseudonymization": {
+                               "encryption_key_reference": "pattern",
+                               "encryption_algorithm": "algorithm",
+                               "stable_identifier_version": "stableIdVersion",
+                               "stable_identifier_type": "FREG_SNR",
+                                "encryption_algorithm_parameters": [
+                                  {
+                                    "key": "value"
+                                  }
+                                ]
+                             }
                            }
                         ]
                       },

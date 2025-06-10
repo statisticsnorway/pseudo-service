@@ -73,7 +73,6 @@ class PseudoFieldTest {
         processor.addMetadata(FieldMetadata.builder()
                 .shortName("shortName")
                 .dataElementPath("path")
-                .dataElementPattern("pattern")
                 .encryptionKeyReference("pattern")
                 .encryptionAlgorithm("algorithm")
                 .encryptionAlgorithmParameters(Map.of("key", "value"))
@@ -108,20 +107,21 @@ class PseudoFieldTest {
                      "processedValue v2"
                    ],
                    "datadoc_metadata": {
-                     "pseudo_variables": [
+                     "variables": [
                        {
                          "short_name": "shortName",
                          "data_element_path": "path",
-                         "data_element_pattern": "pattern",
-                         "stable_identifier_type": "FREG_SNR",
-                         "stable_identifier_version": "stableIdVersion",
-                         "encryption_algorithm": "algorithm",
-                         "encryption_key_reference": "pattern",
-                         "encryption_algorithm_parameters": [
-                           {
-                             "key": "value"
-                           }
-                         ]
+                         "pseudonymization": {
+                           "stable_identifier_type": "FREG_SNR",
+                           "stable_identifier_version": "stableIdVersion",
+                           "encryption_algorithm": "algorithm",
+                           "encryption_key_reference": "pattern",
+                           "encryption_algorithm_parameters": [
+                             {
+                               "key": "value"
+                             }
+                           ]
+                         }
                        }
                      ]
                    },

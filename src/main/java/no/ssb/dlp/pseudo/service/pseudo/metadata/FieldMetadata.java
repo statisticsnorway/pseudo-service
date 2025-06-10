@@ -2,8 +2,9 @@ package no.ssb.dlp.pseudo.service.pseudo.metadata;
 
 import lombok.Builder;
 import lombok.Value;
-import no.ssb.dapla.metadata.EncryptionAlgorithmParameter;
-import no.ssb.dapla.metadata.PseudoVariable;
+import no.ssb.dapla.metadata.datadoc.EncryptionAlgorithmParameter;
+import no.ssb.dapla.metadata.datadoc.Pseudonymization;
+import no.ssb.dapla.metadata.datadoc.Variable;
 
 import java.util.List;
 import java.util.Map;
@@ -17,24 +18,34 @@ public class FieldMetadata {
 
     String shortName;
     String dataElementPath;
-    String dataElementPattern;
     String encryptionKeyReference;
     String encryptionAlgorithm;
     String stableIdentifierVersion;
     boolean stableIdentifierType;
     Map<String, String> encryptionAlgorithmParameters;
 
-    public PseudoVariable toDatadocPseudoVariable() {
-        return PseudoVariable.builder()
-                .withShortName(shortName)
-                .withDataElementPath(dataElementPath)
-                .withDataElementPattern(dataElementPattern)
-                .withEncryptionKeyReference(encryptionKeyReference)
+    // Create a partial datadoc variable which only contains pseudonymization information
+    public Variable toDatadocVariable() {
+        final var pseudonymization =
+                Pseudonymization.builder()
                 .withEncryptionAlgorithm(encryptionAlgorithm)
+                .withEncryptionKeyReference(encryptionKeyReference)
                 .withEncryptionAlgorithmParameters(
-                        toEncryptionAlgorithmParameters())
+                 toEncryptionAlgorithmParameters()
+                )
                 .withStableIdentifierVersion(stableIdentifierVersion)
                 .withStableIdentifierType(stableIdentifierType ? STABLE_IDENTIFIER_TYPE : null)
+                .build();
+        return Variable.builder()
+                .withShortName(shortName)
+                .withDataElementPath(dataElementPath)
+                .withPseudonymization(pseudonymization)
+                // we explicitly set these keys to 'null' so that their keys don't show up in the serialized json object
+                .withName(null)
+                .withPopulationDescription(null)
+                .withComment(null)
+                .withInvalidValueDescription(null)
+                .withCustomType(null)
                 .build();
     }
 

@@ -148,7 +148,6 @@ public class RecordMapProcessorFactory {
                 metadataProcessor.addMetadata(FieldMetadata.builder()
                         .shortName(field.getName())
                         .dataElementPath(normalizePath(field.getPath())) // Skip leading slash and use dot as separator
-                        .dataElementPattern(match.getRule().getPattern())
                         .encryptionKeyReference(funcDeclaration.getArgs().getOrDefault(KEY_REFERENCE, null))
                         .encryptionAlgorithm(match.getFunc().getAlgorithm())
                         .stableIdentifierVersion(sidSnapshotDate)
