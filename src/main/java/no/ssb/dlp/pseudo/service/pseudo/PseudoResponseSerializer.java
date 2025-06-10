@@ -19,7 +19,7 @@ public class PseudoResponseSerializer {
         return enclose(data.concatMap(item -> Flowable.just(item, ","))
                 .startWith("\"data\": [")
                 .skipLast(1) // Skip last comma
-                .concatWith(Flowable.just("], \"datadoc_metadata\": {\"variables\": ["))
+                .concatWith(Flowable.just("], \"datadoc_metadata\": {\"pseudo_variables\": ["))
                 .concatWith(metadata.concatMap(item -> Flowable.just(item, ",")).skipLast(1))
                 .concatWith(Flowable.just("]}, \"metrics\": ["))
                 .concatWith(metrics.concatMap(item -> Flowable.just(item, ",")).skipLast(1))
