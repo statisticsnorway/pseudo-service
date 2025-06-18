@@ -56,6 +56,10 @@ micronaut:
               url: 'https://auth.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
             google:
               url: 'https://www.googleapis.com/oauth2/v3/certs'
+            lab-id-north1-test:
+              url: 'https://labid.lab.dapla-test-external.ssb.no/jwks'
+            lab-id-north1-dev:
+              url: 'https://labid.lab.dapla-dev-external.ssb.no/jwks'
 
   http:
     services:
@@ -86,6 +90,7 @@ endpoints:
 
 logger:
   levels:
+    root: DEBUG
     io.micronaut.security: INFO
     no.ssb.dlp.pseudo.service: DEBUG
 
@@ -146,6 +151,8 @@ app-roles:
   # When using isAuthenticated() the JWT token must be signed by one of the trusted-issuers
   trusted-issuers:
     - 'https://auth.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
+    - 'https://labid.lab.dapla-test-external.ssb.no'
+    - 'https://labid.lab.dapla-dev-external.ssb.no'
   users:
     - isAuthenticated()
   admins:
