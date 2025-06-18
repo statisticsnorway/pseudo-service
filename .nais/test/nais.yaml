@@ -41,7 +41,6 @@ spec:
         - host: "labid.lab.dapla-test-external.ssb.no"
         - host: "labid.lab.dapla-test.ssb.no"
         - host: "labid.lab.dapla-dev-external.ssb.no"
-        - host: "labid.lab.dapla-dev.ssb.no"
 
   liveness:
     path: /health/liveness
@@ -201,8 +200,6 @@ data:
                     url: 'https://labid.lab.dapla-test.ssb.no/jwks'
                   lab-id-north1-dev:
                     url: 'https://labid.lab.dapla-dev-external.ssb.no/jwks'
-                  lab-id-west4-dev:
-                    url: 'https://labid.lab.dapla-dev.ssb.no/jwks'
 
         basic-auth:
           enabled: false
