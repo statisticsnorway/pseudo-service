@@ -90,7 +90,6 @@ endpoints:
 
 logger:
   levels:
-    root: DEBUG
     io.micronaut.security: INFO
     no.ssb.dlp.pseudo.service: DEBUG
 
