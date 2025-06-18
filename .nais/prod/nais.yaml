@@ -38,6 +38,8 @@ spec:
         - host: "secretmanager.googleapis.com"
         - host: "www.googleapis.com"
         - host: "cloudidentity.googleapis.com"
+        - host: "https://labid.lab.dapla-external.ssb.no"
+        - host: "https://labid.lab.dapla.ssb.no"
 
   liveness:
     path: /health/liveness
@@ -189,6 +191,10 @@ data:
                     url: 'https://auth.ssb.no/realms/ssb/protocol/openid-connect/certs'
                   google:
                     url: 'https://www.googleapis.com/oauth2/v3/certs'
+                  lab-id-north1:
+                    url: 'https://labid.lab.dapla-external.ssb.no/jwks'
+                  lab-id-west4:
+                    url: 'https://labid.lab.dapla.ssb.no/jwks'
 
         basic-auth:
           enabled: false
