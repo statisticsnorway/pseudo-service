@@ -37,7 +37,12 @@ public class CustomRolesFinder implements RolesFinder {
     public List<String> resolveRoles(Map<String, Object> attributes) {
         List<String> roles = new ArrayList<>();
 
-        Object username = attributes.get(tokenConfiguration.getNameKey());
+        Object username;
+        switch (attributes.get(tokenConfiguration.getNameKey())) { // Use the "sub" claim if the "email" claim is not present in token
+            case null -> username = attributes.get("sub");
+            case Object obj -> username = obj.toString().replace("@ssb.no", "");
+        }
+        
         boolean trustedIssuer = isTrustedIssuer(attributes);
         log.debug("User {} has a trusted issuer? {}", username, trustedIssuer);
         if (rolesConfig.getAdmins().contains(SecurityRule.IS_AUTHENTICATED) && trustedIssuer
