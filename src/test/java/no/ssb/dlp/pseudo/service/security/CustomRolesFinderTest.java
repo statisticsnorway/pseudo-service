@@ -25,29 +25,29 @@ class CustomRolesFinderTest {
 
     @Test
     void single_user_gets_no_roles() {
-        final String user = "john.doe@ssb.no";
-        assertIterableEquals(List.of(), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), user)));
+        final String email = "john.doe@ssb.no";
+        assertIterableEquals(List.of(), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
     @Test
     void single_user_get_user_role() {
-        final String user = "john.doe@ssb.no";
-        when(rolesConfig.getUsers()).thenReturn(List.of(user));
-        assertIterableEquals(List.of(PseudoServiceRole.USER), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), user)));
+        final String email = "john.doe@ssb.no";
+        when(rolesConfig.getUsers()).thenReturn(List.of(email));
+        assertIterableEquals(List.of(PseudoServiceRole.USER), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
     void single_user_get_admin_role() {
-        final String user = "john.doe@ssb.no";
-        when(rolesConfig.getAdmins()).thenReturn(List.of(user));
-        assertIterableEquals(List.of(PseudoServiceRole.ADMIN), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), user)));
+        final String email = "john.doe@ssb.no";
+        when(rolesConfig.getAdmins()).thenReturn(List.of(email));
+        assertIterableEquals(List.of(PseudoServiceRole.ADMIN), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
     void single_user_get_multiple_roles() {
-        final String user = "john.doe@ssb.no";
-        when(rolesConfig.getUsers()).thenReturn(List.of(user));
-        when(rolesConfig.getAdmins()).thenReturn(List.of(user));
-        assertIterableEquals(List.of(PseudoServiceRole.ADMIN, PseudoServiceRole.USER), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), user)));
+        final String email = "john.doe@ssb.no";
+        when(rolesConfig.getUsers()).thenReturn(List.of(email));
+        when(rolesConfig.getAdmins()).thenReturn(List.of(email));
+        assertIterableEquals(List.of(PseudoServiceRole.ADMIN, PseudoServiceRole.USER), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
@@ -62,29 +62,29 @@ class CustomRolesFinderTest {
 
     @Test
     void group_membership_admin_role() {
-        final String user = "john.doe@ssb.no";
+        final String email = "john.doe@ssb.no";
         final String user_group = "user-group@ssb.no";
         when(rolesConfig.getAdminsGroup()).thenReturn(Optional.of(user_group));
         when(cloudIdentityService.listMembers(eq(user_group)))
-                .thenReturn(List.of(new Membership("John Doe", new EntityKey(user, "ssb"))));
-        assertIterableEquals(List.of(PseudoServiceRole.ADMIN), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), user)));
+                .thenReturn(List.of(new Membership("John Doe", new EntityKey(email, "ssb"))));
+        assertIterableEquals(List.of(PseudoServiceRole.ADMIN), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
     void authenticated_user_gets_no_roles_when_issuer_not_trusted() {
-        final String user = "john.doe@ssb.no";
+        final String email = "john.doe@ssb.no";
         when(rolesConfig.getUsers()).thenReturn(List.of(SecurityRule.IS_AUTHENTICATED));
-        assertIterableEquals(List.of(), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), user)));
+        assertIterableEquals(List.of(), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
     void authenticated_user_get_user_role_when_issuer_is_trusted() {
-        final String user = "john.doe@ssb.no";
+        final String email = "john.doe@ssb.no";
         final String trusted_issuer = "some-issuer-url/auth/realm";
         when(rolesConfig.getUsers()).thenReturn(List.of(SecurityRule.IS_AUTHENTICATED));
         when(rolesConfig.getTrustedIssuers()).thenReturn(List.of(trusted_issuer));
         assertIterableEquals(List.of(PseudoServiceRole.USER),
-                sut.resolveRoles(Map.of(tokenConfig.getNameKey(), user, JWTClaimNames.ISSUER, trusted_issuer)));
+                sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email, JWTClaimNames.ISSUER, trusted_issuer)));
     }
 
     @Test
