@@ -530,6 +530,10 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
+          <argLine> <!-- Neeeded for Mockito agent to attach to JVM -->
+            -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+            -Xshare:off
+          </argLine>
           <detail>true</detail>
           <includes>
             <include>%regex[.*]</include>

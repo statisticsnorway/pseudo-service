@@ -15,9 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.ssb.dlp.pseudo.service.accessgroups.CloudIdentityService;
 import no.ssb.dlp.pseudo.service.accessgroups.Membership;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Singleton
 @Replaces(bean = DefaultRolesFinder.class)
@@ -36,39 +34,47 @@ public class CustomRolesFinder implements RolesFinder {
     @Override
     public List<String> resolveRoles(Map<String, Object> attributes) {
         List<String> roles = new ArrayList<>();
-
-        Object username;
-        switch (attributes.get(tokenConfiguration.getNameKey())) { // Use the "sub" claim if the "email" claim is not present in token
-            case null -> username = attributes.get("sub");
-            case Object obj -> username = obj.toString().replace("@ssb.no", "");
-        }
-        
         boolean trustedIssuer = isTrustedIssuer(attributes);
-        log.debug("User {} has a trusted issuer? {}", username, trustedIssuer);
+
+        Optional<String> email;
+        if (attributes.get(tokenConfiguration.getNameKey()) == null && trustedIssuer) { // Expects three-letter initials only in "sub" claim
+            email = Optional.ofNullable(Objects.toString(attributes.get("sub"), null)).map(v -> v.concat("@ssb.no"));
+        }
+        else {
+            email = Optional.ofNullable(Objects.toString(attributes.get(tokenConfiguration.getNameKey()), null));
+        }
+
+        log.debug("User {} has a trusted issuer? {}", email, trustedIssuer);
+
+        // We check for trustedIssuer when in environments where all authenticated requests are accepted
+        // This is due to Google tokens being valid for authorization purposes,
+        // however they get no roles since they are not a trusted issuer.
+
         if (rolesConfig.getAdmins().contains(SecurityRule.IS_AUTHENTICATED) && trustedIssuer
-                || rolesConfig.getAdmins().contains(username)) {
+                || email.map(rolesConfig.getAdmins()::contains).orElse(false)) {
             roles.add(PseudoServiceRole.ADMIN);
         }
+        List<String> f = rolesConfig.getUsers();
         if (rolesConfig.getUsers().contains(SecurityRule.IS_AUTHENTICATED) && trustedIssuer
-                || rolesConfig.getUsers().contains(username)) {
+                || email.map(rolesConfig.getUsers()::contains).orElse(false)) {
             roles.add(PseudoServiceRole.USER);
         }
         if (rolesConfig.getAdminsGroup().isPresent()) {
             final List<Membership> adminMembers = cloudIdentityService.listMembers(rolesConfig.getAdminsGroup().get());
-            if (adminMembers.stream().anyMatch(value -> value.preferredMemberKey().id().equals(username))) {
+            if (email.map(user_email -> adminMembers.stream().anyMatch(value -> value.preferredMemberKey().id().equals(user_email))).orElse(false) ) {
                 roles.add(PseudoServiceRole.ADMIN);
             }
         }
         if (rolesConfig.getUsersGroup().isPresent()) {
-            final List<Membership> adminMembers = cloudIdentityService.listMembers(rolesConfig.getUsersGroup().get());
-            if (adminMembers.stream().anyMatch(value -> value.preferredMemberKey().id().equals(username))) {
+            final List<Membership> userMembers = cloudIdentityService.listMembers(rolesConfig.getUsersGroup().get());
+            if (email.map(user_email -> userMembers.stream().anyMatch(value -> value.preferredMemberKey().id().equals(user_email))).orElse(false)) {
                 roles.add(PseudoServiceRole.USER);
             }
         }
         if (roles.isEmpty()) {
-            log.info("Could not resolve any roles for user {}", username);
+            log.info("Could not resolve any roles for user {}", email);
         }
-        log.debug("Resolved roles {} for user {}", roles, username);
+        log.debug("Resolved roles {} for user {}", roles, email);
         return roles;
     }
 
