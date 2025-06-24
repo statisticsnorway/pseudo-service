@@ -52,12 +52,12 @@ class CustomRolesFinderTest {
 
     @Test
     void group_membership_user_role() {
-        final String user = "john.doe";
+        final String email = "john.doe";
         final String user_group = "user-group@ssb.no";
         when(rolesConfig.getUsersGroup()).thenReturn(Optional.of(user_group));
         when(cloudIdentityService.listMembers(eq(user_group)))
-                .thenReturn(List.of(new Membership("John Doe", new EntityKey(user, "ssb"))));
-        assertIterableEquals(List.of(PseudoServiceRole.USER), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), user)));
+                .thenReturn(List.of(new Membership("John Doe", new EntityKey(email, "ssb"))));
+        assertIterableEquals(List.of(PseudoServiceRole.USER), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
