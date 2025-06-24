@@ -52,7 +52,7 @@ class CustomRolesFinderTest {
 
     @Test
     void group_membership_user_role() {
-        final String email = "john.doe@ssb.no";
+        final String email = "john.doe";
         final String user_group = "user-group@ssb.no";
         when(rolesConfig.getUsersGroup()).thenReturn(Optional.of(user_group));
         when(cloudIdentityService.listMembers(eq(user_group)))
@@ -85,5 +85,20 @@ class CustomRolesFinderTest {
         when(rolesConfig.getTrustedIssuers()).thenReturn(List.of(trusted_issuer));
         assertIterableEquals(List.of(PseudoServiceRole.USER),
                 sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email, JWTClaimNames.ISSUER, trusted_issuer)));
+    }
+
+    @Test
+    void three_letter_user_get_user_role_when_issuer_is_trusted() {
+        final String user = "john.doe";
+        final String trusted_issuer = "some-issuer-url/auth/realm";
+        TokenConfiguration tokenConfig = mock(TokenConfigurationProperties.class);
+
+        when(rolesConfig.getUsers()).thenReturn(List.of("john.doe@ssb.no"));
+        when(rolesConfig.getTrustedIssuers()).thenReturn(List.of(trusted_issuer));
+        when(tokenConfig.getNameKey()).thenReturn("email");
+
+        CustomRolesFinder finder = new CustomRolesFinder(tokenConfig, this.rolesConfig, this.cloudIdentityService);
+        assertIterableEquals(List.of(PseudoServiceRole.USER),
+                finder.resolveRoles(Map.of("sub", user, JWTClaimNames.ISSUER, trusted_issuer)));
     }
 }
