@@ -54,7 +54,7 @@ public class CustomRolesFinder implements RolesFinder {
                 || email.map(rolesConfig.getAdmins()::contains).orElse(false)) {
             roles.add(PseudoServiceRole.ADMIN);
         }
-        List<String> f = rolesConfig.getUsers();
+
         if (rolesConfig.getUsers().contains(SecurityRule.IS_AUTHENTICATED) && trustedIssuer
                 || email.map(rolesConfig.getUsers()::contains).orElse(false)) {
             roles.add(PseudoServiceRole.USER);
