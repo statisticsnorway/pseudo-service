@@ -215,7 +215,6 @@ data:
 
     logger:
       levels:
-        root: INFO
         io.micronaut.security: INFO
         no.ssb.dlp.pseudo.service: INFO
         io.micronaut.security.token.jwt.validator: DEBUG

@@ -44,7 +44,7 @@ public class CustomRolesFinder implements RolesFinder {
             email = Optional.ofNullable(Objects.toString(attributes.get(tokenConfiguration.getNameKey()), null));
         }
 
-        log.info("User {} has a trusted issuer? {}", email, trustedIssuer);
+        log.debug("User {} has a trusted issuer? {}", email, trustedIssuer);
 
         // We check for trustedIssuer when in environments where all authenticated requests are accepted
         // This is due to Google tokens being valid for authorization purposes,
@@ -67,8 +67,6 @@ public class CustomRolesFinder implements RolesFinder {
         }
         if (rolesConfig.getUsersGroup().isPresent()) {
             final List<Membership> userMembers = cloudIdentityService.listMembers(rolesConfig.getUsersGroup().get());
-            List<String> userEmails = cloudIdentityService.listMembers(rolesConfig.getUsersGroup().get()).stream().map(v -> v.preferredMemberKey().id()).toList();
-            log.info("User group {} has members {}", rolesConfig.getUsersGroup().get(), userEmails);
             if (email.map(user_email -> userMembers.stream().anyMatch(value -> value.preferredMemberKey().id().equals(user_email))).orElse(false)) {
                 roles.add(PseudoServiceRole.USER);
             }
@@ -76,7 +74,7 @@ public class CustomRolesFinder implements RolesFinder {
         if (roles.isEmpty()) {
             log.info("Could not resolve any roles for user {}", email);
         }
-        log.info("Resolved roles {} for user {}", roles, email);
+        log.debug("Resolved roles {} for user {}", roles, email);
         return roles;
     }
 
