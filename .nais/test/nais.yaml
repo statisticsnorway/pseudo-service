@@ -187,6 +187,9 @@ data:
           name-key: email
           jwt:
             signatures:
+              jwks-client:
+                http-client:
+                  enabled: false
               jwks:
                   keycloak-nais-test:
                     url: 'https://auth.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
