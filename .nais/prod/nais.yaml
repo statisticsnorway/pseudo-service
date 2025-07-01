@@ -186,6 +186,9 @@ data:
           name-key: email
           jwt:
             signatures:
+              jwks-client:
+                http-client:
+                  enabled: false
               jwks:
                   keycloak-nais:
                     url: 'https://auth.ssb.no/realms/ssb/protocol/openid-connect/certs'
