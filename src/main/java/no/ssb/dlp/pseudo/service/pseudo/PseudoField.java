@@ -62,8 +62,8 @@ public class PseudoField {
 
         if (name != null) {
             // Regex replace such that "path[9]/thing" -> "path/thing"
-            String nameNoIndices = name.replaceAll("\\[.*?]", "");
-            final boolean validPattern = new FieldDescriptor(nameNoIndices).globMatches(pattern);
+            name = name.replaceAll("\\[.*?]", "");
+            final boolean validPattern = new FieldDescriptor(name).globMatches(pattern);
             if (!validPattern) {
                 throw new IllegalArgumentException(String.format("The pattern '%s' will not match the field name '%s'. " +
                         "Are you sure you didn't mean to use '/%s'?", pattern, name, pattern));
