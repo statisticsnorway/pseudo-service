@@ -45,7 +45,6 @@ public class PseudoField {
      * @param keyset     The encrypted keyset to be used for pseudonymization.
      */
     public PseudoField(String name, String pattern, String pseudoFunc, EncryptedKeysetWrapper keyset) {
-        this.name = name;
 
         pseudoConfig = new PseudoConfig();
 
@@ -69,6 +68,7 @@ public class PseudoField {
                         "Are you sure you didn't mean to use '/%s'?", pattern, name, pattern));
             }
         }
+        this.name = name;
         pseudoConfig.getRules().add(new PseudoFuncRule(name, pattern, pseudoFunc));
     }
 
