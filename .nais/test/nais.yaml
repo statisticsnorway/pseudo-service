@@ -111,6 +111,12 @@ data:
           other:
             num-threads: 100
             prefer-native-transport: true
+            
+      kubernetes:
+        client:
+          config-maps:
+            enabled: true
+            watch: true
 
       http:
         client:
