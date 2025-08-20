@@ -50,6 +50,13 @@ public class CustomRolesFinder implements RolesFinder {
         // This is due to Google tokens being valid for authorization purposes,
         // however they get no roles since they are not a trusted issuer.
 
+        email.ifPresent(e -> {
+            log.debug("Resolved email '{}'", e);
+            rolesConfig.getAdmins().forEach(a ->
+                    log.info("Admin candidate '{}', equals? {}", a, e.equals(a))
+            );
+        });
+
         if (rolesConfig.getAdmins().contains(SecurityRule.IS_AUTHENTICATED) && trustedIssuer
                 || email.map(rolesConfig.getAdmins()::contains).orElse(false)) {
             roles.add(PseudoServiceRole.ADMIN);
