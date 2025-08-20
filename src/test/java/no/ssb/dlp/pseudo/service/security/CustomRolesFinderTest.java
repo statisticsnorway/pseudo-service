@@ -4,6 +4,7 @@ import com.nimbusds.jwt.JWTClaimNames;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.token.config.TokenConfiguration;
 import io.micronaut.security.token.config.TokenConfigurationProperties;
+import net.bytebuddy.utility.JavaConstant;
 import no.ssb.dlp.pseudo.service.accessgroups.CloudIdentityService;
 import no.ssb.dlp.pseudo.service.accessgroups.EntityKey;
 import no.ssb.dlp.pseudo.service.accessgroups.Membership;
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.*;
 class CustomRolesFinderTest {
 
     CloudIdentityService cloudIdentityService = mock(CloudIdentityService.class);
-    StaticRolesConfig rolesConfig = mock(StaticRolesConfig.class);
+    DynamicRolesConfig rolesConfig = mock(DynamicRolesConfig.class);
     TokenConfiguration tokenConfig = new TokenConfigurationProperties();
     CustomRolesFinder sut = new CustomRolesFinder(tokenConfig, rolesConfig, cloudIdentityService);
 

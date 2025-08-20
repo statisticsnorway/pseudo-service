@@ -28,7 +28,7 @@ import java.util.*;
 public class CustomRolesFinder implements RolesFinder {
 
     private final TokenConfiguration tokenConfiguration;
-    private final StaticRolesConfig rolesConfig;
+    private final DynamicRolesConfig rolesConfig;
     private final CloudIdentityService cloudIdentityService;
 
     @Override
@@ -49,13 +49,6 @@ public class CustomRolesFinder implements RolesFinder {
         // We check for trustedIssuer when in environments where all authenticated requests are accepted
         // This is due to Google tokens being valid for authorization purposes,
         // however they get no roles since they are not a trusted issuer.
-
-        email.ifPresent(e -> {
-            log.debug("Resolved email '{}'", e);
-            rolesConfig.getAdmins().forEach(a ->
-                    log.info("Admin candidate '{}', equals? {}", a, e.equals(a))
-            );
-        });
 
         if (rolesConfig.getAdmins().contains(SecurityRule.IS_AUTHENTICATED) && trustedIssuer
                 || email.map(rolesConfig.getAdmins()::contains).orElse(false)) {

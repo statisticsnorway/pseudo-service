@@ -106,6 +106,11 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>io.micronaut.kubernetes</groupId>
+      <artifactId>micronaut-kubernetes-discovery-client</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>no.ssb.dapla.metadata</groupId>
       <artifactId>datadoc-model</artifactId>
       <version>${dapla-datadoc-model.version}</version>
