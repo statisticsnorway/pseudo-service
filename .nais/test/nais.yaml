@@ -111,6 +111,12 @@ data:
           other:
             num-threads: 100
             prefer-native-transport: true
+            
+      kubernetes:
+        client:
+          config-maps:
+            enabled: true
+            watch: true
 
       http:
         client:
@@ -199,8 +205,6 @@ data:
                     url: 'https://www.googleapis.com/oauth2/v3/certs'
                   lab-id-north1-test:
                     url: 'https://labid.lab.dapla-test-external.ssb.no/jwks'
-                  lab-id-west4-test:
-                    url: 'https://labid.lab.dapla-test.ssb.no/jwks'
                   lab-id-north1-dev:
                     url: 'https://labid.lab.dapla-dev-external.ssb.no/jwks'
 
