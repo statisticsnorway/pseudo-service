@@ -39,7 +39,6 @@ spec:
         - host: "www.googleapis.com"
         - host: "cloudidentity.googleapis.com"
         - host: "labid.lab.dapla-test-external.ssb.no"
-        - host: "labid.lab.dapla-test.ssb.no"
         - host: "labid.lab.dapla-dev-external.ssb.no"
 
   liveness:

@@ -39,7 +39,6 @@ spec:
         - host: "www.googleapis.com"
         - host: "cloudidentity.googleapis.com"
         - host: "labid.lab.dapla-external.ssb.no"
-        - host: "labid.lab.dapla.ssb.no"
 
   liveness:
     path: /health/liveness
