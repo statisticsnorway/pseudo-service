@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 class CustomRolesFinderTest {
 
     CloudIdentityService cloudIdentityService = mock(CloudIdentityService.class);
-    DynamicRolesConfig rolesConfig = mock(DynamicRolesConfig.class);
+    StaticRolesConfig rolesConfig = mock(StaticRolesConfig.class);
     TokenConfiguration tokenConfig = new TokenConfigurationProperties();
     CustomRolesFinder sut = new CustomRolesFinder(tokenConfig, rolesConfig, cloudIdentityService);
 
