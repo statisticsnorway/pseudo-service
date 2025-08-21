@@ -28,7 +28,7 @@ import java.util.*;
 public class CustomRolesFinder implements RolesFinder {
 
     private final TokenConfiguration tokenConfiguration;
-    private final DynamicRolesConfig rolesConfig;
+    private final StaticRolesConfig rolesConfig;
     private final CloudIdentityService cloudIdentityService;
 
     @Override
