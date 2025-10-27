@@ -4,6 +4,6 @@ micronaut:
   config-client:
     enabled: true
 gcp:
-  project-id: dev-sirius
+  project-id: staging-dapla-pseudo-6485
   credentials:
     location: private/gcp/sa-keys/dev-dapla-pseudo-service-test-sa-key.json
