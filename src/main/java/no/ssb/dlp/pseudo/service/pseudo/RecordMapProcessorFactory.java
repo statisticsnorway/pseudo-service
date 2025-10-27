@@ -1,5 +1,7 @@
 package no.ssb.dlp.pseudo.service.pseudo;
 
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.crypto.tink.Aead;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import no.ssb.dapla.dlp.pseudo.func.tink.fpe.TinkFpeFunc;
 import no.ssb.dlp.pseudo.core.PseudoException;
 import no.ssb.dlp.pseudo.core.PseudoKeyset;
 import no.ssb.dlp.pseudo.core.PseudoOperation;
+import no.ssb.dlp.pseudo.core.PseudoSecret;
 import no.ssb.dlp.pseudo.core.field.FieldDescriptor;
 import no.ssb.dlp.pseudo.core.field.ValueInterceptorChain;
 import no.ssb.dlp.pseudo.core.func.PseudoFuncDeclaration;
@@ -42,12 +45,17 @@ import static no.ssb.dlp.pseudo.service.sid.SidMapper.*;
 @Slf4j
 public class RecordMapProcessorFactory {
     private final PseudoSecrets pseudoSecrets;
+    private final LoadingCache<String, Aead> aeadCache;
 
     public RecordMapProcessor<PseudoMetadataProcessor> newPseudonymizeRecordProcessor(List<PseudoConfig> pseudoConfigs, String correlationId) {
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
 
         for (PseudoConfig config : pseudoConfigs) {
+            List<PseudoSecret> secrets = pseudoSecrets.resolve();
+            for (PseudoKeyset keyset : config.getKeysets()) {
+                log.info(keyset.getKekUri().toString());
+            }
             final PseudoFuncs fieldPseudonymizer = newPseudoFuncs(config.getRules(),
                     pseudoKeysetsOf(config.getKeysets()));
             chain.preprocessor((f, v) -> init(fieldPseudonymizer, TransformDirection.APPLY, f, v));
@@ -87,7 +95,7 @@ public class RecordMapProcessorFactory {
 
     protected PseudoFuncs newPseudoFuncs(Collection<PseudoFuncRule> rules,
                                          Collection<PseudoKeyset> keysets) {
-        return new PseudoFuncs(rules, pseudoSecrets.resolve(), keysets);
+        return new PseudoFuncs(rules, pseudoSecrets.resolve(), keysets, aeadCache);
     }
 
     private String init(PseudoFuncs pseudoFuncs, TransformDirection direction, FieldDescriptor field, String varValue) {

@@ -24,7 +24,7 @@
     <exec.mainClass>no.ssb.dlp.pseudo.service.Application</exec.mainClass>
     <dapla-datadoc-model.version>1.4</dapla-datadoc-model.version>
     <artifactregistry-maven-wagon.version>2.2.1</artifactregistry-maven-wagon.version>
-    <dapla-dlp-pseudo-core.version>2.0.6</dapla-dlp-pseudo-core.version>
+    <dapla-dlp-pseudo-core.version>2.0.7</dapla-dlp-pseudo-core.version>
     <micronaut.version>4.7.6</micronaut.version>
     <micronaut.openapi.version>5.0.1</micronaut.openapi.version>
     <micronaut.object.storage.version>2.3.0</micronaut.object.storage.version>
