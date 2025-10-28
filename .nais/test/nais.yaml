@@ -115,9 +115,7 @@ data:
         client:
           event-loop-group: other
           read-timeout: 60s
-          shutdown-quiet-period: 115s
-          shutdown-timeout: 120s
-
+          
         services:
           sid-service:
             url: 'http://stable-id-lookup-service.reg-freg'
@@ -150,6 +148,11 @@ data:
             enabled: true
             descriptions: true
             step: PT1M
+      
+      lifecycle:
+        graceful-shutdown:
+          enabled: true
+          grace-period: 120s
 
       router:
         static-resources:
