@@ -114,6 +114,8 @@ data:
         client:
           event-loop-group: other
           read-timeout: 60s
+          shutdown-quiet-period: 115s
+          shutdown-timeout: 120s
 
         services:
           sid-service:
@@ -251,4 +253,4 @@ data:
       default-target-root: gs://ssb-prod-dapla-pseudo-service-data-export/felles
 
     sid.mapper.partition.size: 100000
-
+    
