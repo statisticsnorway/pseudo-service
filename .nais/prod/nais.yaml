@@ -43,12 +43,19 @@ spec:
   liveness:
     path: /health/liveness
     port: 10220
+    failureThreshold: 6
+    timeout: 3
   readiness:
     path: /health/readiness
     port: 10220
+    failureThreshold: 6
+    timeout: 3
   startup:
     path: /health/readiness
     port: 10220
+    initialDelay: 30
+    failureThreshold: 10
+    timeout: 3
   
   prometheus:
     enabled: true
