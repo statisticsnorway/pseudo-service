@@ -128,13 +128,10 @@ data:
           sid-service:
             url: 'http://stable-id-lookup-service.reg-freg'
             path: '/v2'
-            read-timeout: 60s
+            read-timeout: 120s
             pool:
               enabled: true
               max-connections: 50
-            health-check: true
-            health-check-interval: 15s
-            health-check-uri: /health/ready
           cloud-identity-service:
             url: 'https://cloudidentity.googleapis.com'
             path: '/v1'
