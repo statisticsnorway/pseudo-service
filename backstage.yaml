@@ -16,3 +16,5 @@ spec:
   type: service
   owner: dapla-stat-developers
   lifecycle: production
+  dependsOn:
+    - "component:pseudo-core"
