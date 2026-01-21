@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>no.ssb.dapla.dlp.pseudo</groupId>
   <artifactId>pseudo-service</artifactId>
-  <version>3.2.4-SNAPSHOT</version>
+  <version>3.2.4</version>
   <name>pseudo-service</name>
 
   <parent>
@@ -24,7 +24,7 @@
     <exec.mainClass>no.ssb.dlp.pseudo.service.Application</exec.mainClass>
     <dapla-datadoc-model.version>1.4</dapla-datadoc-model.version>
     <artifactregistry-maven-wagon.version>2.2.1</artifactregistry-maven-wagon.version>
-    <dapla-dlp-pseudo-core.version>2.0.7</dapla-dlp-pseudo-core.version>
+    <dapla-dlp-pseudo-core.version>2.0.8</dapla-dlp-pseudo-core.version>
     <micronaut.version>4.10.7</micronaut.version>
     <micronaut.openapi.version>6.19.1</micronaut.openapi.version>
     <micronaut.validation.version>4.12.0</micronaut.validation.version>
