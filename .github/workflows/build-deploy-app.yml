@@ -11,8 +11,33 @@ on:
       - ".gitignore"
 
 jobs:
+  security-scan:
+    name: Trivy Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL'
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
   build-push:
     name: Build and push to registries
+    needs: security-scan
     # When releasing, the Maven release plugin will create two commits -
     # we only want this job to run once, so we exclude one of the commits.
     if: ! contains(${{ github.event.head_commit.message }}, "prepare for next development iteration")
@@ -104,7 +129,10 @@ jobs:
             echo "cluster=test" >> "$GITHUB_OUTPUT"
             echo "nais_config_path=.nais/test/nais.yaml" >> "$GITHUB_OUTPUT"
           fi
-      
+
+
+   
+
   deploy:
     name: Deploy to NAIS
     needs: build-push
