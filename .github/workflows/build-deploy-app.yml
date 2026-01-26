@@ -9,15 +9,23 @@ on:
       - "Makefile"
       - ".mvn"
       - ".gitignore"
-
 jobs:
-  security-scan:
-    name: Trivy Security Scan
+  build-push:
+    name: Build and push to registries
+    # When releasing, the Maven release plugin will create two commits -
+    # we only want this job to run once, so we exclude one of the commits.
+    if: ! contains(${{ github.event.head_commit.message }}, "prepare for next development iteration")
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
       security-events: write
 
+    outputs:
+      nais-tag: ${{steps.nais-deploy-vars.outputs.nais_tag}}
+      nais-cluster: ${{steps.nais-deploy-vars.outputs.cluster}}
+      nais-config-path: ${{steps.nais-deploy-vars.outputs.nais_config_path}}
+    
     steps:
       - uses: actions/checkout@v4
 
@@ -44,27 +52,8 @@ jobs:
 
       - name: Upload Trivy results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
         with:
           sarif_file: 'trivy-results.sarif'
-  build-push:
-    name: Build and push to registries
-    needs: security-scan
-    # When releasing, the Maven release plugin will create two commits -
-    # we only want this job to run once, so we exclude one of the commits.
-    if: ! contains(${{ github.event.head_commit.message }}, "prepare for next development iteration")
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-
-    outputs:
-      nais-tag: ${{steps.nais-deploy-vars.outputs.nais_tag}}
-      nais-cluster: ${{steps.nais-deploy-vars.outputs.cluster}}
-      nais-config-path: ${{steps.nais-deploy-vars.outputs.nais_config_path}}
-    
-    steps:
-      - uses: actions/checkout@v4
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
