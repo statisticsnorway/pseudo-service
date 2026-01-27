@@ -94,9 +94,9 @@ jobs:
       - name: Maven build and install
         run: |
           if [[ ${{github.event_name}} == "release" ]]; then
-            mvn --quiet --batch-mode clean package
+            mvn --batch-mode clean package
           else
-            mvn --quiet --batch-mode -P dapla-artifact-registry deploy
+            mvn --batch-mode -P dapla-artifact-registry deploy
           fi
       
       - name: Add optional extra tag
