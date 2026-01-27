@@ -90,4 +90,4 @@ jobs:
 
       - name: Maven build and install
         shell: bash
-        run: mvn --quiet --batch-mode clean install
+        run: mvn --batch-mode clean install
