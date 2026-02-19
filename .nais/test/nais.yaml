@@ -24,8 +24,8 @@ spec:
       memory: 6Gi
 
   ingresses:
-    - https://pseudo-service.intern.test.ssb.no
-    - https://pseudo-service.test.ssb.no
+    - https://pseudo-service-develop.intern.test.ssb.no
+    - https://pseudo-service-develop.test.ssb.no
 
   accessPolicy:
     outbound:
