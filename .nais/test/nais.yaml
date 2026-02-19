@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: pseudo-service
+  name: pseudo-service-develop
   namespace: {{team}}
   labels:
     team: {{team}}
@@ -14,8 +14,8 @@ spec:
   port: 10210
   terminationGracePeriodSeconds: 180
   replicas:
-    max: 5
-    min: 2
+    max: 1
+    min: 1
   resources:
     requests:
       cpu: 100m

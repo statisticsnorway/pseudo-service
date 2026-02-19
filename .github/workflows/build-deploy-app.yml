@@ -3,7 +3,7 @@ on:
     types: [ published ]
   push:
     branches:
-      - master
+      - performance-improvements
     paths-ignore:
       - "**/*.md"
       - "Makefile"
@@ -130,9 +130,6 @@ jobs:
             echo "cluster=test" >> "$GITHUB_OUTPUT"
             echo "nais_config_path=.nais/test/nais.yaml" >> "$GITHUB_OUTPUT"
           fi
-
-
-   
 
   deploy:
     name: Deploy to NAIS
