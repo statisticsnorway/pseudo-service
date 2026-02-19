@@ -3,7 +3,7 @@ on:
     types: [ published ]
   push:
     branches:
-      - performance-improvements
+      - vibecoded-test
     paths-ignore:
       - "**/*.md"
       - "Makefile"
