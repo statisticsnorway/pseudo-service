@@ -84,7 +84,9 @@ public class PseudoController {
             @Schema(implementation = PseudoFieldRequest.class) String request
     ) {
         PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
-        log.info(Strings.padEnd(String.format("*** Pseudonymize field: %s ", req.getName()), 80, '*'));
+        if (log.isDebugEnabled()) {
+            log.debug(Strings.padEnd(String.format("*** Pseudonymize field: %s ", req.getName()), 80, '*'));
+        }
         PseudoField pseudoField = new PseudoField(req.getName(), req.getPattern(), req.getPseudoFunc(), req.getKeyset());
         try {
             final String correlationId = MDC.get("CorrelationID");
@@ -98,6 +100,38 @@ public class PseudoController {
                             correlationId
                             )
                             .map(o -> o.getBytes(StandardCharsets.UTF_8))
+                    )
+                    .characterEncoding(StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return HttpResponse.serverError(Flowable.error(e));
+        }
+    }
+
+    @Operation(summary = "Pseudonymize field fast", description = "Pseudonymize a single field with optimized path.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Post(value = "/pseudonymize/field-fast", consumes = MediaType.APPLICATION_JSON)
+    @ExecuteOn(TaskExecutors.BLOCKING)
+    public HttpResponse<Flowable<byte[]>> pseudonymizeFieldFast(
+            @Schema(implementation = PseudoFieldRequest.class) String request,
+            @QueryValue(defaultValue = "false") boolean minimalMetricsMode
+    ) {
+        PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
+        if (log.isDebugEnabled()) {
+            log.debug(Strings.padEnd(String.format("*** Pseudonymize field fast: %s ", req.getName()), 80, '*'));
+        }
+        PseudoField pseudoField = new PseudoField(req.getName(), req.getPattern(), req.getPseudoFunc(), req.getKeyset());
+        try {
+            final String correlationId = MDC.get("CorrelationID");
+
+            return HttpResponse.ok(
+                            pseudoField.processFastPseudonymize(
+                                    pseudoConfigSplitter,
+                                    recordProcessorFactory,
+                                    req.values,
+                                    correlationId,
+                                    minimalMetricsMode
+                            )
+                                    .map(o -> o.getBytes(StandardCharsets.UTF_8))
                     )
                     .characterEncoding(StandardCharsets.UTF_8);
         } catch (Exception e) {
@@ -120,7 +154,9 @@ public class PseudoController {
             @Schema(implementation = DepseudoFieldRequest.class) String request
     ) {
         DepseudoFieldRequest req = Json.toObject(DepseudoFieldRequest.class, request);
-        log.info(Strings.padEnd(String.format("*** Depseudonymize field: %s ", req.getName()), 80, '*'));
+        if (log.isDebugEnabled()) {
+            log.debug(Strings.padEnd(String.format("*** Depseudonymize field: %s ", req.getName()), 80, '*'));
+        }
         PseudoField pseudoField = new PseudoField(req.getName(), req.getPattern(), req.getPseudoFunc(), req.getKeyset());
         try {
 
@@ -150,7 +186,9 @@ public class PseudoController {
             @Schema(implementation = RepseudoFieldRequest.class) String request
     ) {
         RepseudoFieldRequest req = Json.toObject(RepseudoFieldRequest.class, request);
-        log.info(Strings.padEnd(String.format("*** Repseudonymize field: %s ", req.getName()), 80, '*'));
+        if (log.isDebugEnabled()) {
+            log.debug(Strings.padEnd(String.format("*** Repseudonymize field: %s ", req.getName()), 80, '*'));
+        }
         PseudoField sourcePseudoField = new PseudoField(req.getName(), req.getPattern(), req.getSourcePseudoFunc(), req.getSourceKeyset());
         PseudoField targetPseudoField = new PseudoField(req.getName(), req.getPattern(), req.getTargetPseudoFunc(), req.getTargetKeyset());
         try {

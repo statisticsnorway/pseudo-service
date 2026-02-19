@@ -20,3 +20,5 @@ http-client.private.env.json
 
 .direnv/
 .envrc
+.tools/
+.metals/
