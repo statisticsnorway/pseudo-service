@@ -76,9 +76,9 @@ public class RecordMapProcessorFactory {
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
         Set<String> metadataAdded = new HashSet<>();
-        Map<String, Optional<PseudoFuncRuleMatch>> fieldMatchCache = new HashMap<>();
 
         for (PseudoConfig config : pseudoConfigs) {
+            Map<String, Optional<PseudoFuncRuleMatch>> fieldMatchCache = new HashMap<>();
             for (PseudoKeyset keyset : config.getKeysets()) {
                 if (log.isDebugEnabled()) {
                     log.debug("Using keyset KEK URI: {}", keyset.getKekUri());
@@ -96,9 +96,9 @@ public class RecordMapProcessorFactory {
     public RecordMapProcessor<PseudoMetadataProcessor> newDepseudonymizeRecordProcessor(List<PseudoConfig> pseudoConfigs, String correlationId) {
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
-        Map<String, Optional<PseudoFuncRuleMatch>> fieldMatchCache = new HashMap<>();
 
         for (PseudoConfig config : pseudoConfigs) {
+            Map<String, Optional<PseudoFuncRuleMatch>> fieldMatchCache = new HashMap<>();
             final PseudoFuncs fieldDepseudonymizer = newPseudoFuncs(config.getRules(),
                     pseudoKeysetsOf(config.getKeysets()));
             final Map<PseudoFuncRule, PseudoFuncDeclaration> funcDeclarations = pseudoFuncDeclarationsOf(config.getRules());
