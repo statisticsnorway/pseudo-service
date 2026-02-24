@@ -28,6 +28,7 @@
     <micronaut.version>4.10.7</micronaut.version>
     <micronaut.openapi.version>6.19.1</micronaut.openapi.version>
     <micronaut-gcp-version>5.13.0</micronaut-gcp-version>
+    <micronaut.tracing.version>7.2.0</micronaut.tracing.version>
     <grpc-netty-shaded-version>1.75.0</grpc-netty-shaded-version>
     <micronaut.validation.version>4.12.0</micronaut.validation.version>
     <auto-service.version>1.1.1</auto-service.version>
@@ -127,9 +128,13 @@
       <version>5.10.1</version>
     </dependency>
     <dependency>
-        <groupId>io.micronaut.tracing</groupId>
-        <artifactId>micronaut-tracing-annotation</artifactId>
-        <version>7.2.0</version>
+      <groupId>io.micronaut.tracing</groupId>
+      <artifactId>micronaut-tracing-annotation</artifactId>
+      <version>${micronaut.tracing.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-exporter-otlp</artifactId>
     </dependency>
     <dependency>
       <groupId>io.micronaut.cache</groupId>
@@ -424,6 +429,11 @@
                 <artifactId>micronaut-openapi</artifactId>
                 <version>${micronaut.openapi.version}</version>
               </path>
+                <path>
+                    <groupId>io.micronaut.tracing</groupId>
+                    <artifactId>micronaut-tracing-opentelemetry-annotation</artifactId>
+                    <version>${micronaut.tracing.version}</version>
+                </path>
               <path>
                 <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service</artifactId>
