@@ -63,6 +63,11 @@ spec:
     path: /prometheus
     port: "10220"
 
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+
   env:
     - name: MICRONAUT_CONFIG_FILES
       value: /conf/bootstrap-test.yml,/conf/application-test.yml,/conf/protected/app-roles.yml

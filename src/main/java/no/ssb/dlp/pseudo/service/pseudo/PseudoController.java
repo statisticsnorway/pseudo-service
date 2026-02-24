@@ -1,20 +1,17 @@
 package no.ssb.dlp.pseudo.service.pseudo;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
-import io.micronaut.core.async.annotation.SingleResult;
 import io.micronaut.http.*;
 import io.micronaut.http.annotation.Error;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.http.hateoas.Link;
-import io.micronaut.http.multipart.StreamingFileUpload;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
-import io.reactivex.Completable;
+import io.micronaut.tracing.annotation.NewSpan;
+import io.micronaut.tracing.annotation.SpanTag;
 import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,22 +20,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.ssb.dapla.dlp.pseudo.func.PseudoFuncFactory;
 import no.ssb.dlp.pseudo.core.PseudoOperation;
-import no.ssb.dlp.pseudo.core.StreamProcessor;
 import no.ssb.dlp.pseudo.core.exception.NoSuchPseudoKeyException;
-import no.ssb.dlp.pseudo.core.file.MoreMediaTypes;
-import no.ssb.dlp.pseudo.core.file.PseudoFileSource;
-import no.ssb.dlp.pseudo.core.map.RecordMapProcessor;
-import no.ssb.dlp.pseudo.core.map.RecordMapSerializerFactory;
 import no.ssb.dlp.pseudo.core.tink.model.EncryptedKeysetWrapper;
-import no.ssb.dlp.pseudo.core.util.HumanReadableBytes;
 import no.ssb.dlp.pseudo.core.util.Json;
-import no.ssb.dlp.pseudo.service.pseudo.metadata.PseudoMetadataProcessor;
 import no.ssb.dlp.pseudo.service.security.PseudoServiceRole;
 import no.ssb.dlp.pseudo.service.sid.InvalidSidSnapshotDateException;
 import no.ssb.dlp.pseudo.service.sid.SidIndexUnavailableException;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import org.slf4j.MDC;
 
 import java.io.File;
@@ -76,12 +64,13 @@ public class PseudoController {
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
 
+    @NewSpan("pseudonyimze column")
     @Operation(summary = "Pseudonymize field", description = "Pseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Post(value = "/pseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
     public HttpResponse<Flowable<byte[]>> pseudonymizeField(
-            @Schema(implementation = PseudoFieldRequest.class) String request
+            @SpanTag("pseudonymize column request") @Schema(implementation = PseudoFieldRequest.class) String request
     ) {
         PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
         log.info(Strings.padEnd(String.format("*** Pseudonymize field: %s ", req.getName()), 80, '*'));
