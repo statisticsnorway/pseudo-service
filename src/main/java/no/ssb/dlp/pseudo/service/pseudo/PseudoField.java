@@ -1,6 +1,7 @@
 package no.ssb.dlp.pseudo.service.pseudo;
 
 import com.google.common.base.Stopwatch;
+import io.micronaut.tracing.annotation.ContinueSpan;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import lombok.AccessLevel;
@@ -80,6 +81,7 @@ public class PseudoField {
      * @param values                 The values to be processed.
      * @return A Flowable stream that processes the field values by applying the configured pseudo rules, and returns them as a lists of strings.
      */
+    @ContinueSpan
     public Flowable<String> process(PseudoConfigSplitter pseudoConfigSplitter,
                                           RecordMapProcessorFactory recordProcessorFactory,
                                           List<String> values,
