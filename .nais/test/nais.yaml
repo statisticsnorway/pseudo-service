@@ -93,25 +93,6 @@ metadata:
   labels:
     team: {{team}}
 data:
-  logback-test.xml: |-
-    <configuration>
-        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>%cyan(%d{HH:mm:ss.SSS}) %X{CorrelationID} %magenta([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n</pattern>
-            </encoder>
-        </appender>
-
-        <logger name="no.ssb.dlp.pseudo.core.util" level="TRACE"/>
-        <logger name="io.micronaut.tracing" level="DEBUG"/>
-        <logger name="io.micronaut.tracing.opentelemetry" level="DEBUG"/>
-        <logger name="io.opentelemetry" level="DEBUG"/>
-        <logger name="io.opentelemetry.sdk" level="DEBUG"/>
-        <logger name="io.opentelemetry.exporter" level="DEBUG"/>
-
-        <root level="info">
-            <appender-ref ref="STDOUT" />
-        </root>
-    </configuration>
   bootstrap-test.yml: |-
     micronaut:
       application:
@@ -229,7 +210,7 @@ data:
                   keycloak-nais-test:
                     url: 'https://auth.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
                   keycloak-nais-dev:
-                    url: https://auth-play.test.ssb.no/realms/ssb/protocol/openid-connect/certs
+                    url: 'https://auth-play.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
                   google:
                     url: 'https://www.googleapis.com/oauth2/v3/certs'
                   lab-id-north1-test:
@@ -259,6 +240,13 @@ data:
         io.micronaut.security: INFO
         no.ssb.dlp.pseudo.service: INFO
         io.micronaut.security.token.jwt.validator: DEBUG
+
+        # Debugg otel tracing instrumentation and exporting
+        io.micronaut.tracing: DEBUG
+        io.micronaut.tracing.opentelemetry: DEBUG
+        io.opentelemetry: DEBUG
+        io.opentelemetry.sdk: DEBUG
+        io.opentelemetry.exporter: DEBUG
 
     services:
       secrets:
