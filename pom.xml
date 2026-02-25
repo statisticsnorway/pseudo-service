@@ -27,8 +27,8 @@
     <dapla-dlp-pseudo-core.version>2.0.8</dapla-dlp-pseudo-core.version>
     <micronaut.version>4.10.7</micronaut.version>
     <micronaut.openapi.version>6.19.1</micronaut.openapi.version>
-    <micronaut-gcp-version>5.13.0</micronaut-gcp-version>
     <micronaut.tracing.version>7.2.0</micronaut.tracing.version>
+    <micronaut-gcp-version>5.13.0</micronaut-gcp-version>
     <grpc-netty-shaded-version>1.75.0</grpc-netty-shaded-version>
     <micronaut.validation.version>4.12.0</micronaut.validation.version>
     <auto-service.version>1.1.1</auto-service.version>
@@ -429,11 +429,11 @@
                 <artifactId>micronaut-openapi</artifactId>
                 <version>${micronaut.openapi.version}</version>
               </path>
-                <path>
-                    <groupId>io.micronaut.tracing</groupId>
-                    <artifactId>micronaut-tracing-opentelemetry-annotation</artifactId>
-                    <version>${micronaut.tracing.version}</version>
-                </path>
+              <path>
+                <groupId>io.micronaut.tracing</groupId>
+                <artifactId>micronaut-tracing-opentelemetry-annotation</artifactId>
+                <version>${micronaut.tracing.version}</version>
+              </path>
               <path>
                 <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service</artifactId>
