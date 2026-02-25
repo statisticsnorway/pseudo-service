@@ -128,13 +128,9 @@
       <version>5.10.1</version>
     </dependency>
     <dependency>
-      <groupId>io.micronaut.tracing</groupId>
-      <artifactId>micronaut-tracing-annotation</artifactId>
-      <version>${micronaut.tracing.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.opentelemetry</groupId>
-      <artifactId>opentelemetry-exporter-otlp</artifactId>
+        <groupId>io.micronaut.tracing</groupId>
+        <artifactId>micronaut-tracing-annotation</artifactId>
+        <version>7.2.0</version>
     </dependency>
     <dependency>
       <groupId>io.micronaut.cache</groupId>
