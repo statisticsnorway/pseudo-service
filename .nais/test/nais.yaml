@@ -66,7 +66,7 @@ spec:
   observability:
     autoInstrumentation:
       enabled: true
-      runtime: sdk
+      runtime: java
 
   env:
     - name: MICRONAUT_CONFIG_FILES
