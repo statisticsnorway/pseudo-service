@@ -128,9 +128,9 @@
       <version>5.10.1</version>
     </dependency>
     <dependency>
-        <groupId>io.micronaut.tracing</groupId>
-        <artifactId>micronaut-tracing-annotation</artifactId>
-        <version>${micronaut.tracing.version}</version>
+      <groupId>io.micronaut.tracing</groupId>
+      <artifactId>micronaut-tracing-annotation</artifactId>
+      <version>${micronaut.tracing.version}</version>
     </dependency>
     <dependency>
       <groupId>io.micronaut.tracing</groupId>
