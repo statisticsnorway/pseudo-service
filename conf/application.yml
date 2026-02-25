@@ -35,13 +35,3 @@ logger:
   levels:
     io.micronaut.security: INFO
     no.ssb.dlp.pseudo.service: DEBUG
-
-otel.service.name: ${OTEL_SERVICE_NAME}
-otel.traces.exporter: otlp
-otel.metrics.exporter: otlp
-otel.logs.exporter: otlp
-otel:
-  exporter:
-    otlp:
-      url:
-        ${OTEL_EXPORTER_OTLP_ENDPOINT}
