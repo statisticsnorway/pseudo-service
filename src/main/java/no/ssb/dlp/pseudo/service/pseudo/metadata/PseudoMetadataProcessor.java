@@ -9,15 +9,19 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Value
 public class PseudoMetadataProcessor {
+
+    private static final int LOG_LIMIT = 100;
 
     String correlationId;
     Map<String, Set<FieldMetadata>> uniqueMetadataPaths = new LinkedHashMap<>();
     ReplayProcessor<FieldMetadata> datadocMetadata = ReplayProcessor.create();
     ReplayProcessor<String> logs = ReplayProcessor.create();
     ReplayProcessor<FieldMetric> metrics = ReplayProcessor.create();
+    AtomicInteger logCount = new AtomicInteger(0);
 
     public PseudoMetadataProcessor(String correlationId) {
         this.correlationId = correlationId;
@@ -29,7 +33,9 @@ public class PseudoMetadataProcessor {
         }
     }
     public void addLog(String log) {
-        logs.onNext(log);
+        if (logCount.getAndIncrement() < LOG_LIMIT) {
+            logs.onNext(log);
+        }
     }
     public void addMetric(FieldMetric fieldMetric) {
         metrics.onNext(fieldMetric);

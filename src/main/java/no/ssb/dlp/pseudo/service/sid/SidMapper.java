@@ -83,33 +83,60 @@ public class SidMapper implements Mapper {
         if (identifier == null) {
             return PseudoFuncOutput.of(null);
         }
-        // Execute the bulk request if necessary
-        if (bulkRequest.isEmpty()) {
-            // Split fnrs or snrs into chunks of BULK_SIZE
-            for (List<String> bulkIdentifiers : Lists.partition(List.copyOf(identifiers), partitionSize)) {
-                log.info("Execute SID-mapping bulk request");
-                final ObservableSubscriber<Map<String, SidInfo>> subscriber;
-
-                if (isFnr) {
-                    subscriber = ObservableSubscriber.subscribe(
-                            sidService.lookupFnr(bulkIdentifiers, getSnapshot()));
-                } else {
-                    subscriber = ObservableSubscriber.subscribe(
-                            sidService.lookupSnr(bulkIdentifiers, getSnapshot()));
-                }
-
-                for (String id : bulkIdentifiers) {
-                    bulkRequest.put(id, subscriber);
-                }
-            }
+        ensureBulkRequestContains(identifier, isFnr);
+        ObservableSubscriber<Map<String, SidInfo>> subscriber = bulkRequest.get(identifier);
+        if (subscriber == null) {
+            throw new RuntimeException("SID subscriber not found for identifier");
         }
-        SidInfo result = bulkRequest.get(identifier).awaitResult()
+        SidInfo result = subscriber.awaitResult()
                 .orElseThrow(() -> new RuntimeException("SID service did not respond"))
                 .get(identifier);
 
         return createMappingLogsAndOutput(result, isFnr, identifier);
 
 
+    }
+
+    private void ensureBulkRequestContains(String identifier, boolean isFnr) {
+        if (bulkRequest.containsKey(identifier)) {
+            return;
+        }
+
+        synchronized (this) {
+            if (bulkRequest.containsKey(identifier)) {
+                return;
+            }
+
+            // Defensive fallback: include the current identifier even if init() was not called
+            identifiers.add(identifier);
+
+            // Initial request: use pre-collected identifiers for efficient bulk lookup.
+            if (bulkRequest.isEmpty()) {
+                for (List<String> bulkIdentifiers : Lists.partition(List.copyOf(identifiers), partitionSize)) {
+                    log.info("Execute SID-mapping bulk request");
+                    final ObservableSubscriber<Map<String, SidInfo>> subscriber;
+
+                    if (isFnr) {
+                        subscriber = ObservableSubscriber.subscribe(
+                                sidService.lookupFnr(bulkIdentifiers, getSnapshot()));
+                    } else {
+                        subscriber = ObservableSubscriber.subscribe(
+                                sidService.lookupSnr(bulkIdentifiers, getSnapshot()));
+                    }
+
+                    for (String id : bulkIdentifiers) {
+                        bulkRequest.put(id, subscriber);
+                    }
+                }
+            } else {
+                // Late/missing identifier: fallback to a tiny lookup to avoid NullPointerException.
+                log.info("Execute SID-mapping fallback request for missing identifier");
+                ObservableSubscriber<Map<String, SidInfo>> subscriber = isFnr
+                        ? ObservableSubscriber.subscribe(sidService.lookupFnr(List.of(identifier), getSnapshot()))
+                        : ObservableSubscriber.subscribe(sidService.lookupSnr(List.of(identifier), getSnapshot()));
+                bulkRequest.put(identifier, subscriber);
+            }
+        }
     }
 
 

@@ -18,6 +18,7 @@ import no.ssb.dlp.pseudo.service.pseudo.metadata.FieldMetric;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.PseudoMetadataProcessor;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -108,17 +109,19 @@ public class PseudoField {
 
         Flowable<String> result = preprocessor.andThen(Flowable.fromIterable(values.stream()
                         .map(v -> mapOptional(v, recordMapProcessor, metadataProcessor)).toList()
-                ))
+                )
                 .map(v -> v.map(Json::from).orElse("null"))
                 .doOnError(throwable -> {
                     log.error("Response failed", throwable);
                     recordMapProcessor.getMetadataProcessor().onErrorAll(throwable);
                 })
                 .doOnComplete(() -> {
-                    log.info("{} took {}", pseudoOperation, stopwatch.stop().elapsed());
+                    if (log.isDebugEnabled()) {
+                        log.debug("{} took {}", pseudoOperation, stopwatch.stop().elapsed());
+                    }
                     // Signal the metadataProcessor to stop collecting metadata
                     recordMapProcessor.getMetadataProcessor().onCompleteAll();
-                });
+                }));
 
         return PseudoResponseSerializer.serialize(result, metadata, logs, metrics);
     }
@@ -147,17 +150,19 @@ public class PseudoField {
 
         Flowable<String> result = preprocessor.andThen(Flowable.fromIterable(values.stream()
                         .map(v -> mapOptional(v, recordMapProcessor, metadataProcessor)).toList()
-                ))
+                )
                 .map(v -> v.map(Json::from).orElse("null"))
                 .doOnError(throwable -> {
                     log.error("Response failed", throwable);
                     metadataProcessor.onErrorAll(throwable);
                 })
                 .doOnComplete(() -> {
-                    log.info("{} took {}", PseudoOperation.REPSEUDONYMIZE, stopwatch.stop().elapsed());
+                    if (log.isDebugEnabled()) {
+                        log.debug("{} took {}", PseudoOperation.REPSEUDONYMIZE, stopwatch.stop().elapsed());
+                    }
                     // Signal the metadataProcessor to stop collecting metadata
                     metadataProcessor.onCompleteAll();
-                });
+                }));
         return PseudoResponseSerializer.serialize(result, metadata, logs, metrics);
     }
 
@@ -173,13 +178,71 @@ public class PseudoField {
 
     protected Completable getPreprocessor(List<String> values, RecordMapProcessor<PseudoMetadataProcessor> recordMapProcessor) {
         if (recordMapProcessor.hasPreprocessors()) {
-            return Completable.fromPublisher(Flowable.fromIterable(values.stream()
-                    .filter(Objects::nonNull)
-                    .map(v -> recordMapProcessor.init(Map.of(this.getName(), v)))
-                    .toList())
+            return Completable.fromPublisher(
+                    Flowable.fromIterable(values.stream()
+                            .filter(Objects::nonNull)
+                            .toList())
+                            .map(v -> recordMapProcessor.init(Map.of(this.getName(), v)))
             );
         } else {
             return Completable.complete();
         }
+    }
+
+    public Flowable<String> processFastPseudonymize(PseudoConfigSplitter pseudoConfigSplitter,
+                                                     RecordMapProcessorFactory recordProcessorFactory,
+                                                     List<String> values,
+                                                     String correlationId,
+                                                     boolean minimalMetricsMode) {
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        List<PseudoConfig> pseudoConfigs = pseudoConfigSplitter.splitIfNecessary(this.getPseudoConfig());
+        RecordMapProcessorFactory.SingleFieldProcessor processor =
+                recordProcessorFactory.newPseudonymizeSingleFieldProcessor(
+                        pseudoConfigs,
+                        this.getName(),
+                        correlationId,
+                        minimalMetricsMode
+                );
+
+        Completable preprocessor = Completable.fromAction(() -> {
+            for (String value : values) {
+                if (value != null) {
+                    processor.init(value);
+                }
+            }
+        }
+        );
+
+        final PseudoMetadataProcessor metadataProcessor = processor.metadataProcessor();
+        final Flowable<String> metadata = minimalMetricsMode
+                ? Flowable.empty()
+                : Flowable.fromPublisher(metadataProcessor.getMetadata());
+        final Flowable<String> logs = minimalMetricsMode
+                ? Flowable.empty()
+                : Flowable.fromPublisher(metadataProcessor.getLogs());
+        final Flowable<String> metrics = minimalMetricsMode
+                ? Flowable.empty()
+                : Flowable.fromPublisher(metadataProcessor.getMetrics());
+
+        Flowable<String> result = preprocessor.andThen(Flowable.defer(() -> {
+                    List<String> serialized = new ArrayList<>(values.size());
+                    for (String value : values) {
+                        String transformed = processor.pseudonymize(value);
+                        serialized.add(transformed == null ? "null" : Json.from(transformed));
+                    }
+                    return Flowable.fromIterable(serialized);
+                }))
+                .doOnError(throwable -> {
+                    log.error("Response failed", throwable);
+                    metadataProcessor.onErrorAll(throwable);
+                })
+                .doOnComplete(() -> {
+                    if (log.isDebugEnabled()) {
+                        log.debug("{} took {}", PseudoOperation.PSEUDONYMIZE, stopwatch.stop().elapsed());
+                    }
+                    metadataProcessor.onCompleteAll();
+                });
+
+        return PseudoResponseSerializer.serialize(result, metadata, logs, metrics);
     }
 }
