@@ -93,6 +93,25 @@ metadata:
   labels:
     team: {{team}}
 data:
+  logback-test.xml: |-
+    <configuration>
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%cyan(%d{HH:mm:ss.SSS}) %X{CorrelationID} %magenta([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <logger name="no.ssb.dlp.pseudo.core.util" level="TRACE"/>
+        <logger name="io.micronaut.tracing" level="DEBUG"/>
+        <logger name="io.micronaut.tracing.opentelemetry" level="DEBUG"/>
+        <logger name="io.opentelemetry" level="DEBUG"/>
+        <logger name="io.opentelemetry.sdk" level="DEBUG"/>
+        <logger name="io.opentelemetry.exporter" level="DEBUG"/>
+
+        <root level="info">
+            <appender-ref ref="STDOUT" />
+        </root>
+    </configuration>
   bootstrap-test.yml: |-
     micronaut:
       application:
