@@ -66,6 +66,7 @@ public class RecordMapProcessorFactory {
         return new RecordMapProcessor<>(chain, metadataProcessor);
     }
 
+    @ContinueSpan
     public RecordMapProcessor<PseudoMetadataProcessor> newDepseudonymizeRecordProcessor(List<PseudoConfig> pseudoConfigs, String correlationId) {
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
@@ -80,6 +81,7 @@ public class RecordMapProcessorFactory {
         return new RecordMapProcessor<>(chain, metadataProcessor);
     }
 
+    @ContinueSpan
     public RecordMapProcessor<PseudoMetadataProcessor> newRepseudonymizeRecordProcessor(PseudoConfig sourcePseudoConfig,
                                                                PseudoConfig targetPseudoConfig, String correlationId) {
         final PseudoFuncs fieldDepseudonymizer = newPseudoFuncs(sourcePseudoConfig.getRules(),

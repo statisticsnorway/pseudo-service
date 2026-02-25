@@ -133,6 +133,11 @@
         <version>${micronaut.tracing.version}</version>
     </dependency>
     <dependency>
+      <groupId>io.micronaut.tracing</groupId>
+      <artifactId>micronaut-tracing-opentelemetry</artifactId>
+      <version>${micronaut.tracing.version}</version>
+    </dependency>
+    <dependency>
       <groupId>io.micronaut.cache</groupId>
       <artifactId>micronaut-cache-core</artifactId>
       <scope>compile</scope>

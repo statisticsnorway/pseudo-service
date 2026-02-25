@@ -12,6 +12,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.tracing.annotation.NewSpan;
 import io.micronaut.tracing.annotation.SpanTag;
 import io.reactivex.Flowable;
+import io.opentelemetry.api.trace.Span;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -73,6 +74,12 @@ public class PseudoController {
             @SpanTag("pseudonymize column request") @Schema(implementation = PseudoFieldRequest.class) String request
     ) {
         PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
+        Span currentSpan = Span.current();
+        if (currentSpan.getSpanContext().isValid() && req != null) {
+            currentSpan.setAttribute("pseudo.field", req.getName());
+            currentSpan.setAttribute("pseudo.pattern", req.getPattern());
+            currentSpan.setAttribute("pseudo.values.count", req.getValues() == null ? 0 : req.getValues().size());
+        }
         log.info(Strings.padEnd(String.format("*** Pseudonymize field: %s ", req.getName()), 80, '*'));
         PseudoField pseudoField = new PseudoField(req.getName(), req.getPattern(), req.getPseudoFunc(), req.getKeyset());
         try {
