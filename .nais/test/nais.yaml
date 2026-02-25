@@ -273,3 +273,7 @@ data:
       default-target-root: gs://ssb-staging-dapla-pseudo-service-data-export/felles
 
     sid.mapper.partition.size: 100000
+
+    otel:
+      traces:
+        exporter: otlp
