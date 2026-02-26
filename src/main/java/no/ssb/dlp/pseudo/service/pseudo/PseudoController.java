@@ -103,14 +103,15 @@ public class PseudoController {
      * @param request JSON string representing a {@link DepseudoFieldRequest} object.
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
-    @NewSpan("depseudonymize column")
+    @WithSpan("depseudonymize column")
+    @AddingSpanAttributes
     @Operation(summary = "Depseudonymize field", description = "Depseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Secured({PseudoServiceRole.ADMIN})
     @Post(value = "/depseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
     public HttpResponse<Flowable<byte[]>> depseudonymizeField(
-            @SpanTag("depseudonymize column request") @Schema(implementation = DepseudoFieldRequest.class) String request
+            @SpanAttribute("depseudonymize column request") @Schema(implementation = DepseudoFieldRequest.class) String request
     ) {
         DepseudoFieldRequest req = Json.toObject(DepseudoFieldRequest.class, request);
         Span currentSpan = Span.current();
