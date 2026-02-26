@@ -2,7 +2,7 @@ package no.ssb.dlp.pseudo.service.pseudo;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.crypto.tink.Aead;
-import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,6 @@ import no.ssb.dapla.dlp.pseudo.func.tink.fpe.TinkFpeFunc;
 import no.ssb.dlp.pseudo.core.PseudoException;
 import no.ssb.dlp.pseudo.core.PseudoKeyset;
 import no.ssb.dlp.pseudo.core.PseudoOperation;
-import no.ssb.dlp.pseudo.core.PseudoSecret;
 import no.ssb.dlp.pseudo.core.field.FieldDescriptor;
 import no.ssb.dlp.pseudo.core.field.ValueInterceptorChain;
 import no.ssb.dlp.pseudo.core.func.PseudoFuncDeclaration;
@@ -48,13 +47,12 @@ public class RecordMapProcessorFactory {
     private final PseudoSecrets pseudoSecrets;
     private final LoadingCache<String, Aead> aeadCache;
 
-    @AddingSpanAttributes
+    @WithSpan
     public RecordMapProcessor<PseudoMetadataProcessor> newPseudonymizeRecordProcessor(List<PseudoConfig> pseudoConfigs, String correlationId) {
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
 
         for (PseudoConfig config : pseudoConfigs) {
-            List<PseudoSecret> secrets = pseudoSecrets.resolve();
             for (PseudoKeyset keyset : config.getKeysets()) {
                 log.info(keyset.getKekUri().toString());
             }
@@ -66,7 +64,7 @@ public class RecordMapProcessorFactory {
         return new RecordMapProcessor<>(chain, metadataProcessor);
     }
 
-    @AddingSpanAttributes
+    @WithSpan
     public RecordMapProcessor<PseudoMetadataProcessor> newDepseudonymizeRecordProcessor(List<PseudoConfig> pseudoConfigs, String correlationId) {
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
@@ -81,7 +79,7 @@ public class RecordMapProcessorFactory {
         return new RecordMapProcessor<>(chain, metadataProcessor);
     }
 
-    @AddingSpanAttributes
+    @WithSpan
     public RecordMapProcessor<PseudoMetadataProcessor> newRepseudonymizeRecordProcessor(PseudoConfig sourcePseudoConfig,
                                                                PseudoConfig targetPseudoConfig, String correlationId) {
         final PseudoFuncs fieldDepseudonymizer = newPseudoFuncs(sourcePseudoConfig.getRules(),

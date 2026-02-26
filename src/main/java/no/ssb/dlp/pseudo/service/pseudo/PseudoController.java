@@ -66,9 +66,7 @@ public class PseudoController {
     @Produces(MediaType.APPLICATION_JSON)
     @Post(value = "/pseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
-    public HttpResponse<Flowable<byte[]>> pseudonymizeField(
-            @SpanAttribute("pseudonymize column request") @Schema(implementation = PseudoFieldRequest.class) String request
-    ) {
+    public HttpResponse<Flowable<byte[]>> pseudonymizeField(@SpanAttribute("pseudonymize column request") @Schema(implementation = PseudoFieldRequest.class) String request) {
         PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
         Span currentSpan = Span.current();
         if (currentSpan.getSpanContext().isValid() && req != null) {
@@ -82,16 +80,14 @@ public class PseudoController {
             final String correlationId = MDC.get("CorrelationID");
 
             return HttpResponse.ok(
-                    pseudoField.process(
-                            pseudoConfigSplitter,
-                            recordProcessorFactory,
-                            req.values,
-                            PseudoOperation.PSEUDONYMIZE,
-                            correlationId
-                            )
-                            .map(o -> o.getBytes(StandardCharsets.UTF_8))
-                    )
-                    .characterEncoding(StandardCharsets.UTF_8);
+              pseudoField.process(
+                pseudoConfigSplitter,
+                recordProcessorFactory,
+                req.values,
+                PseudoOperation.PSEUDONYMIZE,
+                correlationId
+              ).map(o -> o.getBytes(StandardCharsets.UTF_8))
+            ).characterEncoding(StandardCharsets.UTF_8);
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
         }
@@ -110,9 +106,7 @@ public class PseudoController {
     @Secured({PseudoServiceRole.ADMIN})
     @Post(value = "/depseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
-    public HttpResponse<Flowable<byte[]>> depseudonymizeField(
-            @SpanAttribute("depseudonymize column request") @Schema(implementation = DepseudoFieldRequest.class) String request
-    ) {
+    public HttpResponse<Flowable<byte[]>> depseudonymizeField(@SpanAttribute("depseudonymize column request") @Schema(implementation = DepseudoFieldRequest.class) String request) {
         DepseudoFieldRequest req = Json.toObject(DepseudoFieldRequest.class, request);
         Span currentSpan = Span.current();
         if (currentSpan.getSpanContext().isValid() && req != null) {
@@ -126,10 +120,7 @@ public class PseudoController {
 
             final String correlationId = MDC.get("CorrelationID");
 
-            return HttpResponse.ok(pseudoField.process(
-                    pseudoConfigSplitter, recordProcessorFactory,req.values, PseudoOperation.DEPSEUDONYMIZE, correlationId)
-                            .map(o -> o.getBytes(StandardCharsets.UTF_8)))
-                    .characterEncoding(StandardCharsets.UTF_8);
+            return HttpResponse.ok(pseudoField.process(pseudoConfigSplitter, recordProcessorFactory, req.values, PseudoOperation.DEPSEUDONYMIZE, correlationId).map(o -> o.getBytes(StandardCharsets.UTF_8))).characterEncoding(StandardCharsets.UTF_8);
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
         }
@@ -146,9 +137,7 @@ public class PseudoController {
     @Secured({PseudoServiceRole.ADMIN})
     @Post(value = "/repseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
-    public HttpResponse<Flowable<byte[]>> repseudonymizeField(
-            @Schema(implementation = RepseudoFieldRequest.class) String request
-    ) {
+    public HttpResponse<Flowable<byte[]>> repseudonymizeField(@Schema(implementation = RepseudoFieldRequest.class) String request) {
         RepseudoFieldRequest req = Json.toObject(RepseudoFieldRequest.class, request);
         log.info(Strings.padEnd(String.format("*** Repseudonymize field: %s ", req.getName()), 80, '*'));
         PseudoField sourcePseudoField = new PseudoField(req.getName(), req.getPattern(), req.getSourcePseudoFunc(), req.getSourceKeyset());
@@ -156,10 +145,7 @@ public class PseudoController {
         try {
 
             final String correlationId = MDC.get("CorrelationID");
-            return HttpResponse.ok(
-                    sourcePseudoField.process(recordProcessorFactory, req.values, targetPseudoField, correlationId)
-                            .map(o -> o.getBytes(StandardCharsets.UTF_8)))
-                    .characterEncoding(StandardCharsets.UTF_8);
+            return HttpResponse.ok(sourcePseudoField.process(recordProcessorFactory, req.values, targetPseudoField, correlationId).map(o -> o.getBytes(StandardCharsets.UTF_8))).characterEncoding(StandardCharsets.UTF_8);
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
         }
@@ -209,34 +195,29 @@ public class PseudoController {
 
     @Error
     public HttpResponse<JsonError> unknownPseudoKeyError(HttpRequest request, NoSuchPseudoKeyException e) {
-        JsonError error = new JsonError(e.getMessage())
-                .link(Link.SELF, Link.of(request.getUri()));
+        JsonError error = new JsonError(e.getMessage()).link(Link.SELF, Link.of(request.getUri()));
         return HttpResponse.<JsonError>badRequest().body(error);
     }
 
     @Error
     public HttpResponse<JsonError> sidIndexUnavailable(HttpRequest request, SidIndexUnavailableException e) {
-        JsonError error = new JsonError(e.getMessage())
-                .link(Link.SELF, Link.of(request.getUri()));
+        JsonError error = new JsonError(e.getMessage()).link(Link.SELF, Link.of(request.getUri()));
         return HttpResponse.<JsonError>serverError().status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
     }
 
     @Error
     public HttpResponse<JsonError> illegalArgument(HttpRequest request, IllegalArgumentException e) {
-        JsonError error = new JsonError(e.getMessage())
-                .link(Link.SELF, Link.of(request.getUri()));
+        JsonError error = new JsonError(e.getMessage()).link(Link.SELF, Link.of(request.getUri()));
         return HttpResponse.<JsonError>badRequest().body(error);
     }
 
     @Error
     public HttpResponse<JsonError> sidVersionInvalid(HttpRequest request, PseudoFuncFactory.PseudoFuncInitException e) {
-        if (e.getCause() instanceof InvocationTargetException && e.getCause().getCause() instanceof InvalidSidSnapshotDateException){
-            JsonError error = new JsonError(e.getCause().getCause().getMessage())
-                    .link(Link.SELF, Link.of(request.getUri()));
+        if (e.getCause() instanceof InvocationTargetException && e.getCause().getCause() instanceof InvalidSidSnapshotDateException) {
+            JsonError error = new JsonError(e.getCause().getCause().getMessage()).link(Link.SELF, Link.of(request.getUri()));
             return HttpResponse.<JsonError>badRequest().body(error);
         }
-        JsonError error = new JsonError(e.getMessage())
-                .link(Link.SELF, Link.of(request.getUri()));
+        JsonError error = new JsonError(e.getMessage()).link(Link.SELF, Link.of(request.getUri()));
         return HttpResponse.<JsonError>serverError().status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
     }
 }
