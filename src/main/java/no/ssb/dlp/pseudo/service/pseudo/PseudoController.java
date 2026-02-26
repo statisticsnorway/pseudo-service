@@ -103,15 +103,23 @@ public class PseudoController {
      * @param request JSON string representing a {@link DepseudoFieldRequest} object.
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
+    @WithSpan("depseudonymize column")
+    @AddingSpanAttributes
     @Operation(summary = "Depseudonymize field", description = "Depseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Secured({PseudoServiceRole.ADMIN})
     @Post(value = "/depseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
     public HttpResponse<Flowable<byte[]>> depseudonymizeField(
-            @Schema(implementation = DepseudoFieldRequest.class) String request
+            @SpanAttribute("depseudonymize column request") @Schema(implementation = DepseudoFieldRequest.class) String request
     ) {
         DepseudoFieldRequest req = Json.toObject(DepseudoFieldRequest.class, request);
+        Span currentSpan = Span.current();
+        if (currentSpan.getSpanContext().isValid() && req != null) {
+            currentSpan.setAttribute("pseudo.field", req.getName());
+            currentSpan.setAttribute("pseudo.pattern", req.getPattern());
+            currentSpan.setAttribute("pseudo.values.count", req.getValues() == null ? 0 : req.getValues().size());
+        }
         log.info(Strings.padEnd(String.format("*** Depseudonymize field: %s ", req.getName()), 80, '*'));
         PseudoField pseudoField = new PseudoField(req.getName(), req.getPattern(), req.getPseudoFunc(), req.getKeyset());
         try {
