@@ -10,16 +10,18 @@
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = ["x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin"];
       perSystem = {
-        config,
-        self',
-        inputs',
         pkgs,
-        system,
         ...
       }: {
         devShells.default = pkgs.mkShell {
           name = "dapla-pseudo-service";
-          packages = with pkgs; [gnumake maven openjdk];
+          packages = with pkgs; [
+            gnumake
+            nixd
+            maven
+            openjdk
+            yaml-language-server
+          ];
         };
         formatter = pkgs.alejandra;
       };
