@@ -9,8 +9,9 @@ import io.micronaut.http.hateoas.Link;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.tracing.annotation.NewSpan;
-import io.micronaut.tracing.annotation.SpanTag;
+import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
+import io.opentelemetry.instrumentation.annotations.SpanAttribute;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.reactivex.Flowable;
 import io.opentelemetry.api.trace.Span;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,14 +31,8 @@ import no.ssb.dlp.pseudo.service.sid.SidIndexUnavailableException;
 
 import org.slf4j.MDC;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.Principal;
 import java.util.List;
 
 /*
@@ -65,13 +60,14 @@ public class PseudoController {
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
 
-    @NewSpan("pseudonyimze column")
+    @WithSpan("pseudonyimze column")
+    @AddingSpanAttributes
     @Operation(summary = "Pseudonymize field", description = "Pseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Post(value = "/pseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
     public HttpResponse<Flowable<byte[]>> pseudonymizeField(
-            @SpanTag("pseudonymize column request") @Schema(implementation = PseudoFieldRequest.class) String request
+            @SpanAttribute("pseudonymize column request") @Schema(implementation = PseudoFieldRequest.class) String request
     ) {
         PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
         Span currentSpan = Span.current();
