@@ -142,6 +142,10 @@
       <artifactId>opentelemetry-exporter-otlp</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.opentelemetry.instrumentation</groupId>
+      <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.micronaut.cache</groupId>
       <artifactId>micronaut-cache-core</artifactId>
       <scope>compile</scope>
