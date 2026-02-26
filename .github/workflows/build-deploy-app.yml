@@ -9,12 +9,17 @@ on:
       - "Makefile"
       - ".mvn"
       - ".gitignore"
+
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+
 jobs:
   build-push:
     name: Build and push to registries
     # When releasing, the Maven release plugin will create two commits -
     # we only want this job to run once, so we exclude one of the commits.
-    if: ! contains(${{ github.event.head_commit.message }}, "prepare for next development iteration")
+    if: ${{ !contains(${{ github.event.head_commit.message }}, "prepare for next development iteration") }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
