@@ -1,5 +1,6 @@
 package no.ssb.dlp.pseudo.service.pseudo.metadata;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.reactivex.processors.ReplayProcessor;
 import lombok.Value;
 import no.ssb.dlp.pseudo.core.util.Json;
@@ -34,12 +35,15 @@ public class PseudoMetadataProcessor {
     public void addMetric(FieldMetric fieldMetric) {
         metrics.onNext(fieldMetric);
     }
+    @WithSpan
     public Publisher<String> getMetadata() {
         return datadocMetadata.map(FieldMetadata::toDatadocVariable).map(Json::from);
     }
+    @WithSpan
     public Publisher<String> getLogs() {
         return logs.map(Json::from);
     }
+    @WithSpan
     public Publisher<String> getMetrics() {
         return metrics.groupBy(FieldMetric::name)
                 .flatMapSingle(group ->

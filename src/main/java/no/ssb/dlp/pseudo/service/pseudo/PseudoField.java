@@ -1,6 +1,9 @@
 package no.ssb.dlp.pseudo.service.pseudo;
 
 import com.google.common.base.Stopwatch;
+import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
+import io.opentelemetry.instrumentation.annotations.SpanAttribute;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import lombok.AccessLevel;
@@ -75,21 +78,23 @@ public class PseudoField {
     /**
      * Creates a Flowable that processes each value of the field, by applying the configured pseudo rules using a recordMapProcessor.
      * This variant of the process() method is intended for "pseudonymize" and "depseudonymize" operations.
+     *
      * @param pseudoConfigSplitter   The PseudoConfigSplitter instance to use for splitting pseudo configurations.
      * @param recordProcessorFactory The RecordMapProcessorFactory instance to use for creating a new PseudonymizeRecordProcessor.
      * @param values                 The values to be processed.
      * @return A Flowable stream that processes the field values by applying the configured pseudo rules, and returns them as a lists of strings.
      */
-    public Flowable<String> process(PseudoConfigSplitter pseudoConfigSplitter,
-                                          RecordMapProcessorFactory recordProcessorFactory,
-                                          List<String> values,
-                                          PseudoOperation pseudoOperation,
-                                          String correlationId) {
+    @WithSpan
+    public Flowable<String> process(@SpanAttribute("pseudoConfigSplitter") PseudoConfigSplitter pseudoConfigSplitter,
+                                    @SpanAttribute("recordProcessorFactory") RecordMapProcessorFactory recordProcessorFactory,
+                                    @SpanAttribute("values") List<String> values,
+                                    @SpanAttribute("pseudoOperation") PseudoOperation pseudoOperation,
+                                    String correlationId) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         List<PseudoConfig> pseudoConfigs = pseudoConfigSplitter.splitIfNecessary(this.getPseudoConfig());
 
         RecordMapProcessor<PseudoMetadataProcessor> recordMapProcessor;
-        switch (pseudoOperation){
+        switch (pseudoOperation) {
             case PSEUDONYMIZE -> recordMapProcessor = recordProcessorFactory.
                     newPseudonymizeRecordProcessor(pseudoConfigs, correlationId);
             case DEPSEUDONYMIZE -> recordMapProcessor = recordProcessorFactory.
@@ -124,14 +129,15 @@ public class PseudoField {
     /**
      * Creates a Flowable that processes each value of the field, by applying the configured pseudo rules using a recordMapProcessor.
      * This variant of the process() method is intended for the "repseudonymize" operation.
+     *
      * @param recordProcessorFactory The RecordMapProcessorFactory instance to use for creating a new PseudonymizeRecordProcessor.
      * @param values                 The values to be processed.
      * @return A Flowable stream that processes the field values by applying the configured pseudo rules, and returns them as a lists of strings.
      */
     public Flowable<String> process(RecordMapProcessorFactory recordProcessorFactory,
-                                          List<String> values,
-                                          PseudoField targetPseudoField,
-                                          String correlationId) {
+                                    List<String> values,
+                                    PseudoField targetPseudoField,
+                                    String correlationId) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         PseudoConfig targetPseudoConfig = targetPseudoField.getPseudoConfig();
         RecordMapProcessor<PseudoMetadataProcessor> recordMapProcessor = recordProcessorFactory.
