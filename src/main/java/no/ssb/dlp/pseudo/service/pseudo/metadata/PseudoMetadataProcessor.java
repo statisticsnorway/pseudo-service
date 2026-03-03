@@ -1,11 +1,13 @@
 package no.ssb.dlp.pseudo.service.pseudo.metadata;
 
-import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
 import io.reactivex.processors.ReplayProcessor;
 import lombok.Value;
 import no.ssb.dlp.pseudo.core.util.Json;
 import org.reactivestreams.Publisher;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,16 +37,19 @@ public class PseudoMetadataProcessor {
     public void addMetric(FieldMetric fieldMetric) {
         metrics.onNext(fieldMetric);
     }
-    @WithSpan
+    @AddingSpanAttributes
     public Publisher<String> getMetadata() {
+        Span.current().addEvent("getMetadata", Instant.now());
         return datadocMetadata.map(FieldMetadata::toDatadocVariable).map(Json::from);
     }
-    @WithSpan
+    @AddingSpanAttributes
     public Publisher<String> getLogs() {
+        Span.current().addEvent("getLogs", Instant.now());
         return logs.map(Json::from);
     }
-    @WithSpan
+    @AddingSpanAttributes
     public Publisher<String> getMetrics() {
+        Span.current().addEvent("getMetrics", Instant.now());
         return metrics.groupBy(FieldMetric::name)
                 .flatMapSingle(group ->
                     group.count().map(c -> Map.of(group.getKey(), c.intValue())
