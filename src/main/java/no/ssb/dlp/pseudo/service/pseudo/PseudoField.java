@@ -1,6 +1,7 @@
 package no.ssb.dlp.pseudo.service.pseudo;
 
 import com.google.common.base.Stopwatch;
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
 import io.opentelemetry.instrumentation.annotations.SpanAttribute;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
@@ -19,6 +20,7 @@ import no.ssb.dlp.pseudo.core.util.Json;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.FieldMetric;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.PseudoMetadataProcessor;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -84,12 +86,13 @@ public class PseudoField {
      * @param values                 The values to be processed.
      * @return A Flowable stream that processes the field values by applying the configured pseudo rules, and returns them as a lists of strings.
      */
-    @WithSpan
+    @AddingSpanAttributes
     public Flowable<String> process(@SpanAttribute("pseudoConfigSplitter") PseudoConfigSplitter pseudoConfigSplitter,
                                     @SpanAttribute("recordProcessorFactory") RecordMapProcessorFactory recordProcessorFactory,
                                     @SpanAttribute("values") List<String> values,
                                     @SpanAttribute("pseudoOperation") PseudoOperation pseudoOperation,
                                     String correlationId) {
+        Span.current().addEvent("process pseudo field", Instant.now());
         Stopwatch stopwatch = Stopwatch.createStarted();
         List<PseudoConfig> pseudoConfigs = pseudoConfigSplitter.splitIfNecessary(this.getPseudoConfig());
 
