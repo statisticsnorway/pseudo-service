@@ -2,6 +2,7 @@ package no.ssb.dlp.pseudo.service.pseudo;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.crypto.tink.Aead;
+import io.micronaut.tracing.annotation.ContinueSpan;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
@@ -50,6 +51,7 @@ public class RecordMapProcessorFactory {
     private final PseudoSecrets pseudoSecrets;
     private final LoadingCache<String, Aead> aeadCache;
 
+    @ContinueSpan
     @AddingSpanAttributes
     public RecordMapProcessor<PseudoMetadataProcessor> newPseudonymizeRecordProcessor(List<PseudoConfig> pseudoConfigs, String correlationId) {
         Span.current().addEvent("newPseudonymizeRecordProcessor", Instant.now());
