@@ -49,6 +49,7 @@ public class PseudoField {
      * @param pseudoFunc The pseudo function definition.
      * @param keyset     The encrypted keyset to be used for pseudonymization.
      */
+    @WithSpan
     public PseudoField(String name, String pattern, String pseudoFunc, EncryptedKeysetWrapper keyset) {
 
         pseudoConfig = new PseudoConfig();

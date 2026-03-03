@@ -33,6 +33,7 @@ import org.slf4j.MDC;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 
 /*
@@ -75,18 +76,23 @@ public class PseudoController {
             currentSpan.setAttribute("pseudo.values.count", req.getValues() == null ? 0 : req.getValues().size());
         }
         log.info(Strings.padEnd(String.format("*** Pseudonymize field: %s ", req.getName()), 80, '*'));
+        currentSpan.addEvent("create_pseudo_field", Instant.now());
         PseudoField pseudoField = new PseudoField(req.getName(), req.getPattern(), req.getPseudoFunc(), req.getKeyset());
         try {
             final String correlationId = MDC.get("CorrelationID");
 
+            currentSpan.addEvent("process_pseudo_field", Instant.now());
+            final var result = pseudoField.process(
+                    pseudoConfigSplitter,
+                    recordProcessorFactory,
+                    req.values,
+                    PseudoOperation.PSEUDONYMIZE,
+                    correlationId
+            ).map(o -> o.getBytes(StandardCharsets.UTF_8));
+            currentSpan.addEvent("finished_process_pseudo_field", Instant.now());
+
             return HttpResponse.ok(
-              pseudoField.process(
-                pseudoConfigSplitter,
-                recordProcessorFactory,
-                req.values,
-                PseudoOperation.PSEUDONYMIZE,
-                correlationId
-              ).map(o -> o.getBytes(StandardCharsets.UTF_8))
+              result
             ).characterEncoding(StandardCharsets.UTF_8);
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
