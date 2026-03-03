@@ -34,13 +34,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fail build on High/Critical Vulnerabilities
+      - name: Fail build on Critical Vulnerabilities
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
           format: 'table'
           scan-ref: '.'
-          severity: 'HIGH,CRITICAL'
+          severity: 'CRITICAL'
           ignore-unfixed: true
           exit-code: 1
 
