@@ -76,7 +76,6 @@ public class PseudoController {
             currentSpan.setAttribute("pseudo.values.count", req.getValues() == null ? 0 : req.getValues().size());
         }
         log.info(Strings.padEnd(String.format("*** Pseudonymize field: %s ", req.getName()), 80, '*'));
-        currentSpan.addEvent("create_pseudo_field", Instant.now());
         PseudoField pseudoField = new PseudoField(req.getName(), req.getPattern(), req.getPseudoFunc(), req.getKeyset());
         try {
             final String correlationId = MDC.get("CorrelationID");
