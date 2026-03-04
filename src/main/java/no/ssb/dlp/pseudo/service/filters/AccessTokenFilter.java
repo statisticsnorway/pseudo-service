@@ -75,7 +75,7 @@ public class AccessTokenFilter implements HttpClientFilter {
 
     @SneakyThrows
     @WithSpan
-    private String getAccessToken(String audience) {
+    protected String getAccessToken(String audience) {
         return credentials.createScoped(audience).refreshAccessToken().getTokenValue();
     }
 
