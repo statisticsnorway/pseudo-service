@@ -25,6 +25,7 @@ import java.util.*;
         @Requires(notEquals = "endpoints.cloud-run.enabled", value = "true")
 })
 @Slf4j
+@WithSpan
 public class CustomRolesFinder implements RolesFinder {
 
     private final TokenConfiguration tokenConfiguration;
