@@ -2,7 +2,6 @@ package no.ssb.dlp.pseudo.service.tracing;
 
 import io.micronaut.aop.MethodInterceptor;
 import io.micronaut.aop.MethodInvocationContext;
-import jakarta.inject.Singleton;
 import io.reactivex.Flowable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -16,8 +15,7 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 
-@Singleton
-public class WithSpanInterceptor implements MethodInterceptor<Object, Object> {
+public final class WithSpanInterceptor implements MethodInterceptor<Object, Object> {
 
     private static final Class<Context> OTEL_CONTEXT_KEY = Context.class;
     private final Tracer tracer;
