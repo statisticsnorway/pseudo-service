@@ -137,6 +137,7 @@ public class PseudoField {
      * @param values                 The values to be processed.
      * @return A Flowable stream that processes the field values by applying the configured pseudo rules, and returns them as a lists of strings.
      */
+    @WithSpan
     public Flowable<String> process(RecordMapProcessorFactory recordProcessorFactory,
                                     List<String> values,
                                     PseudoField targetPseudoField,
