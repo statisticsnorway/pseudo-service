@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -52,6 +53,7 @@ public class AccessTokenFilter implements HttpClientFilter {
     }
 
     @SneakyThrows
+    @WithSpan
     public Publisher<? extends HttpResponse<?>> doFilter(MutableHttpRequest<?> request, ClientFilterChain chain) {
         Optional<AccessTokenFilterConfig> config = getConfig(request);
         if (config.isPresent()) {
@@ -72,7 +74,8 @@ public class AccessTokenFilter implements HttpClientFilter {
     }
 
     @SneakyThrows
-    private String getAccessToken(String audience) {
+    @WithSpan
+    protected String getAccessToken(String audience) {
         return credentials.createScoped(audience).refreshAccessToken().getTokenValue();
     }
 

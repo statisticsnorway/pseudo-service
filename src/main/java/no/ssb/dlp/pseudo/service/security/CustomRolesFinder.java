@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.ssb.dlp.pseudo.service.accessgroups.CloudIdentityService;
 import no.ssb.dlp.pseudo.service.accessgroups.Membership;
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.*;
 
@@ -25,6 +26,7 @@ import java.util.*;
         @Requires(notEquals = "endpoints.cloud-run.enabled", value = "true")
 })
 @Slf4j
+@WithSpan
 public class CustomRolesFinder implements RolesFinder {
 
     private final TokenConfiguration tokenConfiguration;

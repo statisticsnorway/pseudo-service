@@ -61,7 +61,7 @@ public class PseudoController {
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
 
-    @WithSpan("pseudonyimze column")
+    @WithSpan("pseudonymize column")
     @AddingSpanAttributes
     @Operation(summary = "Pseudonymize field", description = "Pseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
@@ -137,13 +137,21 @@ public class PseudoController {
      * @param request JSON string representing a {@link RepseudoFieldRequest} object.
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
+    @WithSpan("repseudonymize column")
+    @AddingSpanAttributes
     @Operation(summary = "Repseudonymize field", description = "Repseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Secured({PseudoServiceRole.ADMIN})
     @Post(value = "/repseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
-    public HttpResponse<Flowable<byte[]>> repseudonymizeField(@Schema(implementation = RepseudoFieldRequest.class) String request) {
+    public HttpResponse<Flowable<byte[]>> repseudonymizeField(@SpanAttribute("repseudonymize column request") @Schema(implementation = RepseudoFieldRequest.class) String request) {
         RepseudoFieldRequest req = Json.toObject(RepseudoFieldRequest.class, request);
+        Span currentSpan = Span.current();
+        if (currentSpan.getSpanContext().isValid() && req != null) {
+            currentSpan.setAttribute("pseudo.field", req.getName());
+            currentSpan.setAttribute("pseudo.pattern", req.getPattern());
+            currentSpan.setAttribute("pseudo.values.count", req.getValues() == null ? 0 : req.getValues().size());
+        }
         log.info(Strings.padEnd(String.format("*** Repseudonymize field: %s ", req.getName()), 80, '*'));
         PseudoField sourcePseudoField = new PseudoField(req.getName(), req.getPattern(), req.getSourcePseudoFunc(), req.getSourceKeyset());
         PseudoField targetPseudoField = new PseudoField(req.getName(), req.getPattern(), req.getTargetPseudoFunc(), req.getTargetKeyset());
