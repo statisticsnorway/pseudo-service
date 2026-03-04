@@ -20,6 +20,7 @@ import no.ssb.dlp.pseudo.core.tink.model.EncryptedKeysetWrapper;
 import no.ssb.dlp.pseudo.core.util.Json;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.FieldMetric;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.PseudoMetadataProcessor;
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,6 @@ import java.util.Optional;
 @Data
 @Slf4j
 public class PseudoField {
-    private static final Tracer tracer = GlobalOpenTelemetry.getTracer("pseudo-service");
     @Getter(AccessLevel.PROTECTED)
     private static final int BUFFER_SIZE = 10000;
     @Getter(AccessLevel.PROTECTED)
@@ -87,52 +87,46 @@ public class PseudoField {
      * @param values                 The values to be processed.
      * @return A Flowable stream that processes the field values by applying the configured pseudo rules, and returns them as a lists of strings.
      */
-    @AddingSpanAttributes
-    public Flowable<String> process(@SpanAttribute("pseudoConfigSplitter") PseudoConfigSplitter pseudoConfigSplitter,
-                                    @SpanAttribute("recordProcessorFactory") RecordMapProcessorFactory recordProcessorFactory,
-                                    @SpanAttribute("values") List<String> values,
-                                    @SpanAttribute("pseudoOperation") PseudoOperation pseudoOperation,
+    @WithSpan
+    public Flowable<String> process(PseudoConfigSplitter pseudoConfigSplitter,
+                                    RecordMapProcessorFactory recordProcessorFactory,
+                                    List<String> values,
+                                    PseudoOperation pseudoOperation,
                                     String correlationId) {
-        final var span = tracer.spanBuilder("PseudoField.process").startSpan();
-        try (Scope scope = span.makeCurrent()) {
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        List<PseudoConfig> pseudoConfigs = pseudoConfigSplitter.splitIfNecessary(this.getPseudoConfig());
 
-            Stopwatch stopwatch = Stopwatch.createStarted();
-            List<PseudoConfig> pseudoConfigs = pseudoConfigSplitter.splitIfNecessary(this.getPseudoConfig());
-
-            RecordMapProcessor<PseudoMetadataProcessor> recordMapProcessor;
-            switch (pseudoOperation) {
-                case PSEUDONYMIZE -> recordMapProcessor = recordProcessorFactory.
-                        newPseudonymizeRecordProcessor(pseudoConfigs, correlationId);
-                case DEPSEUDONYMIZE -> recordMapProcessor = recordProcessorFactory.
-                        newDepseudonymizeRecordProcessor(pseudoConfigs, correlationId);
-                default -> throw new RuntimeException(
-                        String.format("Pseudo operation \"%s\" not supported for this method", pseudoOperation));
-            }
-            Completable preprocessor = getPreprocessor(values, recordMapProcessor);
-            // Metadata will be processes in parallel with the data, but must be collected separately
-            final PseudoMetadataProcessor metadataProcessor = recordMapProcessor.getMetadataProcessor();
-            final Flowable<String> metadata = Flowable.fromPublisher(metadataProcessor.getMetadata());
-            final Flowable<String> logs = Flowable.fromPublisher(metadataProcessor.getLogs());
-            final Flowable<String> metrics = Flowable.fromPublisher(metadataProcessor.getMetrics());
-
-            Flowable<String> result = preprocessor.andThen(Flowable.fromIterable(values.stream()
-                            .map(v -> mapOptional(v, recordMapProcessor, metadataProcessor)).toList()
-                    ))
-                    .map(v -> v.map(Json::from).orElse("null"))
-                    .doOnError(throwable -> {
-                        log.error("Response failed", throwable);
-                        recordMapProcessor.getMetadataProcessor().onErrorAll(throwable);
-                    })
-                    .doOnComplete(() -> {
-                        log.info("{} took {}", pseudoOperation, stopwatch.stop().elapsed());
-                        // Signal the metadataProcessor to stop collecting metadata
-                        recordMapProcessor.getMetadataProcessor().onCompleteAll();
-                    });
-
-            return PseudoResponseSerializer.serialize(result, metadata, logs, metrics);
-        } finally {
-            span.end();
+        RecordMapProcessor<PseudoMetadataProcessor> recordMapProcessor;
+        switch (pseudoOperation) {
+            case PSEUDONYMIZE -> recordMapProcessor = recordProcessorFactory.
+                    newPseudonymizeRecordProcessor(pseudoConfigs, correlationId);
+            case DEPSEUDONYMIZE -> recordMapProcessor = recordProcessorFactory.
+                    newDepseudonymizeRecordProcessor(pseudoConfigs, correlationId);
+            default -> throw new RuntimeException(
+                    String.format("Pseudo operation \"%s\" not supported for this method", pseudoOperation));
         }
+        Completable preprocessor = getPreprocessor(values, recordMapProcessor);
+        // Metadata will be processes in parallel with the data, but must be collected separately
+        final PseudoMetadataProcessor metadataProcessor = recordMapProcessor.getMetadataProcessor();
+        final Flowable<String> metadata = Flowable.fromPublisher(metadataProcessor.getMetadata());
+        final Flowable<String> logs = Flowable.fromPublisher(metadataProcessor.getLogs());
+        final Flowable<String> metrics = Flowable.fromPublisher(metadataProcessor.getMetrics());
+
+        Flowable<String> result = preprocessor.andThen(Flowable.fromIterable(values.stream()
+                        .map(v -> mapOptional(v, recordMapProcessor, metadataProcessor)).toList()
+                ))
+                .map(v -> v.map(Json::from).orElse("null"))
+                .doOnError(throwable -> {
+                    log.error("Response failed", throwable);
+                    recordMapProcessor.getMetadataProcessor().onErrorAll(throwable);
+                })
+                .doOnComplete(() -> {
+                    log.info("{} took {}", pseudoOperation, stopwatch.stop().elapsed());
+                    // Signal the metadataProcessor to stop collecting metadata
+                    recordMapProcessor.getMetadataProcessor().onCompleteAll();
+                });
+
+        return PseudoResponseSerializer.serialize(result, metadata, logs, metrics);
     }
 
     /**
