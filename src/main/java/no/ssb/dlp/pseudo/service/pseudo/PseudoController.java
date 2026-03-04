@@ -9,7 +9,6 @@ import io.micronaut.http.hateoas.Link;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.tracing.annotation.NewSpan;
 import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
 import io.opentelemetry.instrumentation.annotations.SpanAttribute;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
@@ -62,7 +61,6 @@ public class PseudoController {
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
 
-    @NewSpan
     @WithSpan("pseudonyimze column")
     @AddingSpanAttributes
     @Operation(summary = "Pseudonymize field", description = "Pseudonymize a field.")
