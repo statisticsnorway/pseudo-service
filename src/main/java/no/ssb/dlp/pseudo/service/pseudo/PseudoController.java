@@ -9,9 +9,6 @@ import io.micronaut.http.hateoas.Link;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
-import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
-import io.opentelemetry.instrumentation.annotations.SpanAttribute;
-import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.reactivex.Flowable;
 import io.opentelemetry.api.trace.Span;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +26,7 @@ import no.ssb.dlp.pseudo.service.security.PseudoServiceRole;
 import no.ssb.dlp.pseudo.service.sid.InvalidSidSnapshotDateException;
 import no.ssb.dlp.pseudo.service.sid.SidIndexUnavailableException;
 
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 import org.slf4j.MDC;
 
 import java.lang.reflect.InvocationTargetException;
@@ -61,13 +59,12 @@ public class PseudoController {
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
 
-    @WithSpan("pseudonymize column")
-    @AddingSpanAttributes
+    @WithSpan
     @Operation(summary = "Pseudonymize field", description = "Pseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Post(value = "/pseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
-    public HttpResponse<Flowable<byte[]>> pseudonymizeField(@SpanAttribute("pseudonymize column request") @Schema(implementation = PseudoFieldRequest.class) String request) {
+    public HttpResponse<Flowable<byte[]>> pseudonymizeField(@Schema(implementation = PseudoFieldRequest.class) String request) {
         PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
         Span currentSpan = Span.current();
         if (currentSpan.getSpanContext().isValid() && req != null) {
@@ -104,14 +101,13 @@ public class PseudoController {
      * @param request JSON string representing a {@link DepseudoFieldRequest} object.
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
-    @WithSpan("depseudonymize column")
-    @AddingSpanAttributes
+    @WithSpan
     @Operation(summary = "Depseudonymize field", description = "Depseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Secured({PseudoServiceRole.ADMIN})
     @Post(value = "/depseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
-    public HttpResponse<Flowable<byte[]>> depseudonymizeField(@SpanAttribute("depseudonymize column request") @Schema(implementation = DepseudoFieldRequest.class) String request) {
+    public HttpResponse<Flowable<byte[]>> depseudonymizeField(@Schema(implementation = DepseudoFieldRequest.class) String request) {
         DepseudoFieldRequest req = Json.toObject(DepseudoFieldRequest.class, request);
         Span currentSpan = Span.current();
         if (currentSpan.getSpanContext().isValid() && req != null) {
@@ -137,14 +133,13 @@ public class PseudoController {
      * @param request JSON string representing a {@link RepseudoFieldRequest} object.
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
-    @WithSpan("repseudonymize column")
-    @AddingSpanAttributes
+    @WithSpan
     @Operation(summary = "Repseudonymize field", description = "Repseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Secured({PseudoServiceRole.ADMIN})
     @Post(value = "/repseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
-    public HttpResponse<Flowable<byte[]>> repseudonymizeField(@SpanAttribute("repseudonymize column request") @Schema(implementation = RepseudoFieldRequest.class) String request) {
+    public HttpResponse<Flowable<byte[]>> repseudonymizeField(@Schema(implementation = RepseudoFieldRequest.class) String request) {
         RepseudoFieldRequest req = Json.toObject(RepseudoFieldRequest.class, request);
         Span currentSpan = Span.current();
         if (currentSpan.getSpanContext().isValid() && req != null) {

@@ -58,11 +58,10 @@ public class AccessTokenFilter implements HttpClientFilter {
         Optional<AccessTokenFilterConfig> config = getConfig(request);
         if (config.isPresent()) {
             request.bearerAuth(getAccessToken(config.get().getAudience()));
-            setProjectIdHeader(request);
         } else {
             request.bearerAuth(getAccessToken(getAudienceFromRequest(request)));
-            setProjectIdHeader(request);
         }
+        setProjectIdHeader(request);
         return chain.proceed(request);
     }
 
