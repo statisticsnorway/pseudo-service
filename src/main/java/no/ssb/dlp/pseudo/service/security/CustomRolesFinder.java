@@ -38,13 +38,11 @@ public class CustomRolesFinder implements RolesFinder {
         List<String> roles = new ArrayList<>();
         boolean trustedIssuer = isTrustedIssuer(attributes);
 
-        Optional<String> email;
-        if (attributes.get(tokenConfiguration.getNameKey()) == null && trustedIssuer) { // Expects three-letter initials only in "sub" claim
-            email = Optional.ofNullable(Objects.toString(attributes.get("sub"), null)).map(v -> v.concat("@ssb.no"));
-        }
-        else {
-            email = Optional.ofNullable(Objects.toString(attributes.get(tokenConfiguration.getNameKey()), null));
-        }
+        Optional<String> email =
+           attributes.get(tokenConfiguration.getNameKey()) == null && trustedIssuer
+           // Expects three-letter initials only in "sub" claim
+           ? Optional.ofNullable(Objects.toString(attributes.get("sub"), null)).map(v -> v.concat("@ssb.no"))
+           : Optional.ofNullable(Objects.toString(attributes.get(tokenConfiguration.getNameKey()), null));
 
         log.debug("User {} has a trusted issuer? {}", email, trustedIssuer);
 
@@ -52,18 +50,16 @@ public class CustomRolesFinder implements RolesFinder {
         // This is due to Google tokens being valid for authorization purposes,
         // however they get no roles since they are not a trusted issuer.
 
-        if (rolesConfig.getAdmins().contains(SecurityRule.IS_AUTHENTICATED) && trustedIssuer
-                || email.map(rolesConfig.getAdmins()::contains).orElse(false)) {
+        if (rolesConfig.getAdmins().contains(SecurityRule.IS_AUTHENTICATED) && trustedIssuer || email.map(rolesConfig.getAdmins()::contains).orElse(false)) {
             roles.add(PseudoServiceRole.ADMIN);
         }
 
-        if (rolesConfig.getUsers().contains(SecurityRule.IS_AUTHENTICATED) && trustedIssuer
-                || email.map(rolesConfig.getUsers()::contains).orElse(false)) {
+        if (rolesConfig.getUsers().contains(SecurityRule.IS_AUTHENTICATED) && trustedIssuer || email.map(rolesConfig.getUsers()::contains).orElse(false)) {
             roles.add(PseudoServiceRole.USER);
         }
         if (rolesConfig.getAdminsGroup().isPresent()) {
             final List<Membership> adminMembers = cloudIdentityService.listMembers(rolesConfig.getAdminsGroup().get());
-            if (email.map(user_email -> adminMembers.stream().anyMatch(value -> value.preferredMemberKey().id().equals(user_email))).orElse(false) ) {
+            if (email.map(user_email -> adminMembers.stream().anyMatch(value -> value.preferredMemberKey().id().equals(user_email))).orElse(false)) {
                 roles.add(PseudoServiceRole.ADMIN);
             }
         }
