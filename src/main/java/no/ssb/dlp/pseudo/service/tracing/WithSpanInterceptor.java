@@ -2,6 +2,7 @@ package no.ssb.dlp.pseudo.service.tracing;
 
 import io.micronaut.aop.MethodInterceptor;
 import io.micronaut.aop.MethodInvocationContext;
+import io.micronaut.core.type.Argument;
 import io.reactivex.Flowable;
 import jakarta.inject.Singleton;
 import org.reactivestreams.Publisher;
@@ -41,6 +42,7 @@ public final class WithSpanInterceptor implements MethodInterceptor<Object, Obje
                 .startSpan();
 
         try (Scope scope = span.makeCurrent()) {
+            addSpanAttributes(span, context);
             result = context.proceed();
         } catch (Exception e) {
             span.recordException(e);
@@ -82,5 +84,47 @@ public final class WithSpanInterceptor implements MethodInterceptor<Object, Obje
 
         span.end();
         return result;
+    }
+
+    private static void addSpanAttributes(Span span, MethodInvocationContext<Object, Object> context) {
+        Argument<?>[] arguments = context.getArguments();
+        Object[] values = context.getParameterValues();
+        for (int i = 0; i < arguments.length; i++) {
+            Argument<?> argument = arguments[i];
+            if (!argument.getAnnotationMetadata().hasAnnotation(SpanAttribute.class)) {
+                continue;
+            }
+
+            String name = argument.getAnnotationMetadata()
+                    .stringValue(SpanAttribute.class)
+                    .orElse("");
+            if (name.isEmpty()) {
+                name = argument.getName();
+            }
+            if (name == null || name.isEmpty()) {
+                continue;
+            }
+
+            Object value = i < values.length ? values[i] : null;
+            setAttribute(span, name, value);
+        }
+    }
+
+    private static void setAttribute(Span span, String name, Object value) {
+        switch (value) {
+            case null -> {
+                return;
+            }
+            case String stringValue -> span.setAttribute(name, stringValue);
+            case Boolean booleanValue -> span.setAttribute(name, booleanValue);
+            case Long longValue -> span.setAttribute(name, longValue);
+            case Integer intValue -> span.setAttribute(name, intValue.longValue());
+            case Short shortValue -> span.setAttribute(name, shortValue.longValue());
+            case Byte byteValue -> span.setAttribute(name, byteValue.longValue());
+            case Double doubleValue -> span.setAttribute(name, doubleValue);
+            case Float floatValue -> span.setAttribute(name, floatValue.doubleValue());
+            case Character charValue -> span.setAttribute(name, String.valueOf(charValue));
+            default -> span.setAttribute(name, String.valueOf(value));
+        }
     }
 }

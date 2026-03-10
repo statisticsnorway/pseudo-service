@@ -29,6 +29,7 @@ import no.ssb.dlp.pseudo.core.tink.model.EncryptedKeysetWrapper;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.FieldMetadata;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.FieldMetric;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.PseudoMetadataProcessor;
+import no.ssb.dlp.pseudo.service.tracing.SpanAttribute;
 import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.Collection;
@@ -49,9 +50,7 @@ public class RecordMapProcessorFactory {
     private final LoadingCache<String, Aead> aeadCache;
 
     @WithSpan
-    public RecordMapProcessor<PseudoMetadataProcessor> newPseudonymizeRecordProcessor(List<PseudoConfig> pseudoConfigs, String correlationId) {
-        final var currentSpan = Span.current();
-        currentSpan.setAttribute("pseudoConfigs", pseudoConfigs.toString());
+    public RecordMapProcessor<PseudoMetadataProcessor> newPseudonymizeRecordProcessor(@SpanAttribute List<PseudoConfig> pseudoConfigs, String correlationId) {
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
 
