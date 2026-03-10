@@ -68,9 +68,13 @@ public class PseudoController {
         PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
         Span currentSpan = Span.current();
         if (currentSpan.getSpanContext().isValid() && req != null) {
-            currentSpan.setAttribute("pseudo.field", req.getName());
-            currentSpan.setAttribute("pseudo.pattern", req.getPattern());
-            currentSpan.setAttribute("pseudo.values.count", req.getValues() == null ? 0 : req.getValues().size());
+            currentSpan.setAttribute("pseudoRequest.field", req.getName());
+            currentSpan.setAttribute("pseudoRequest.pattern", req.getPattern());
+            final var values = req.getValues();
+            if (values != null) {
+                currentSpan.setAttribute("pseudoRequest.values.count", values.size());
+                currentSpan.setAttribute("pseudoRequest.values", values.toString());
+            }
         }
         log.info(Strings.padEnd(String.format("*** Pseudonymize field: %s ", req.getName()), 80, '*'));
         PseudoField pseudoField = new PseudoField(req.getName(), req.getPattern(), req.getPseudoFunc(), req.getKeyset());

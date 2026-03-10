@@ -2,6 +2,7 @@ package no.ssb.dlp.pseudo.service.filters;
 
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
+import io.micronaut.cache.annotation.Cacheable;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Value;
 import io.micronaut.http.HttpResponse;
@@ -9,6 +10,7 @@ import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.filter.ClientFilterChain;
 import io.micronaut.http.filter.HttpClientFilter;
 import io.micronaut.inject.qualifiers.Qualifiers;
+import io.opentelemetry.api.trace.Span;
 import jakarta.annotation.Nullable;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -18,6 +20,7 @@ import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
 import java.io.FileInputStream;
 import java.net.URI;
 import java.util.Optional;
@@ -55,7 +58,9 @@ public class AccessTokenFilter implements HttpClientFilter {
     @SneakyThrows
     @WithSpan
     public Publisher<? extends HttpResponse<?>> doFilter(MutableHttpRequest<?> request, ClientFilterChain chain) {
-        Optional<AccessTokenFilterConfig> config = getConfig(request);
+        final var currentSpan = Span.current();
+        currentSpan.setAttribute("request.url", request.getUri().toString());
+        final var config = request.getAttribute("micronaut.http.serviceId").map(Object::toString).flatMap(this::getConfig);
         if (config.isPresent()) {
             request.bearerAuth(getAccessToken(config.get().getAudience()));
         } else {
@@ -78,13 +83,14 @@ public class AccessTokenFilter implements HttpClientFilter {
         return credentials.createScoped(audience).refreshAccessToken().getTokenValue();
     }
 
-    private Optional<AccessTokenFilterConfig> getConfig(MutableHttpRequest<?> request) {
-        final Optional<Object> serviceId = request.getAttribute("micronaut.http.serviceId");
-
-        if (applicationContext != null && serviceId.isPresent()) {
-            return applicationContext.findBean(AccessTokenFilterConfig.class, Qualifiers.byName(serviceId.get().toString()));
-        }
-        return Optional.empty();
+    @Cacheable(value="access-token-filter-cache", parameters = {"serviceId"})
+    @WithSpan
+    protected Optional<AccessTokenFilterConfig> getConfig(String serviceId) {
+        return Optional
+                .ofNullable(applicationContext)
+                .flatMap(ac ->
+                    ac.findBean(AccessTokenFilterConfig.class, Qualifiers.byName(serviceId))
+                );
     }
 
     private String getAudienceFromRequest(final MutableHttpRequest<?> request) {

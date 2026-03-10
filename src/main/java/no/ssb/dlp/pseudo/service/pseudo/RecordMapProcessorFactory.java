@@ -2,6 +2,7 @@ package no.ssb.dlp.pseudo.service.pseudo;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.crypto.tink.Aead;
+import io.opentelemetry.api.trace.Span;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,8 @@ public class RecordMapProcessorFactory {
 
     @WithSpan
     public RecordMapProcessor<PseudoMetadataProcessor> newPseudonymizeRecordProcessor(List<PseudoConfig> pseudoConfigs, String correlationId) {
+        final var currentSpan = Span.current();
+        currentSpan.setAttribute("pseudoConfigs", pseudoConfigs.toString());
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
 

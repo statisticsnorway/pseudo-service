@@ -2,6 +2,7 @@ package no.ssb.dlp.pseudo.service.accessgroups;
 
 import io.micronaut.cache.annotation.Cacheable;
 import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.reactivex.Flowable;
 import jakarta.inject.Singleton;
@@ -19,8 +20,10 @@ public class CloudIdentityService {
     @WithSpan
     @Cacheable(value = "cloud-identity-service-cache", parameters = {"groupEmail"})
     public List<Membership> listMembers(String groupEmail) {
+        final var currentSpan = Span.current();
 
         return Flowable.fromPublisher(cloudIdentityClient.lookup(groupEmail))
+                .doOnNext(lookupResponse -> currentSpan.setAttribute("lookupResponse.groupEmail", lookupResponse.getGroupName()))
                 .flatMap(lookupResponse -> fetchMemberships(lookupResponse.getGroupName(), null,
                         new ArrayList<>()))
                 .blockingFirst();
