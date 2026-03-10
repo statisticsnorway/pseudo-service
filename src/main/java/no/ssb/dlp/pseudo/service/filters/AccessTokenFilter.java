@@ -23,6 +23,7 @@ import jakarta.inject.Singleton;
 
 import java.io.FileInputStream;
 import java.net.URI;
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -61,12 +62,16 @@ public class AccessTokenFilter implements HttpClientFilter {
         final var currentSpan = Span.current();
         currentSpan.setAttribute("request.url", request.getUri().toString());
         final var config = request.getAttribute("micronaut.http.serviceId").map(Object::toString).flatMap(this::getConfig);
+        currentSpan.addEvent("Add bearer auth", Instant.now());
         if (config.isPresent()) {
             request.bearerAuth(getAccessToken(config.get().getAudience()));
         } else {
             request.bearerAuth(getAccessToken(getAudienceFromRequest(request)));
         }
+        currentSpan.addEvent("Add bearer auth (finished)", Instant.now());
+        currentSpan.addEvent("Set project ID", Instant.now());
         setProjectIdHeader(request);
+        currentSpan.addEvent("Set project ID (finished)", Instant.now());
         return chain.proceed(request);
     }
 
