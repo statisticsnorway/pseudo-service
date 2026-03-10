@@ -379,6 +379,7 @@
           <version>${maven-compiler-plugin.version}</version>
           <configuration>
             <release>${jdk.version}</release>
+            <parameters>true</parameters>
             <annotationProcessorPaths combine.self="override">
               <path>
                 <groupId>org.projectlombok</groupId>
@@ -437,6 +438,11 @@
                 <groupId>io.micronaut.openapi</groupId>
                 <artifactId>micronaut-openapi</artifactId>
                 <version>${micronaut.openapi.version}</version>
+              </path>
+              <path>
+                <groupId>io.micronaut.tracing</groupId>
+                <artifactId>micronaut-tracing-annotation</artifactId>
+                <version>${micronaut.tracing.version}</version>
               </path>
               <path>
                 <groupId>io.micronaut.tracing</groupId>

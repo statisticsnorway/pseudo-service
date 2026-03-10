@@ -5,6 +5,7 @@ import io.opentelemetry.api.trace.Span;
 import io.reactivex.Flowable;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import no.ssb.dlp.pseudo.service.tracing.SpanAttribute;
 import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.ArrayList;
@@ -17,11 +18,8 @@ public class CloudIdentityService {
 
     @WithSpan
     @Cacheable(value = "cloud-identity-service-cache", parameters = {"groupEmail"})
-    public List<Membership> listMembers(String groupEmail) {
-        final var currentSpan = Span.current();
-
+    public List<Membership> listMembers(@SpanAttribute String groupEmail) {
         return Flowable.fromPublisher(cloudIdentityClient.lookup(groupEmail))
-                .doOnNext(lookupResponse -> currentSpan.setAttribute("lookupResponse.groupEmail", lookupResponse.getGroupName()))
                 .flatMap(lookupResponse -> fetchMemberships(lookupResponse.getGroupName(), null,
                         new ArrayList<>()))
                 .blockingFirst();
@@ -36,7 +34,7 @@ public class CloudIdentityService {
      * @return the list of all memberships
      */
     @WithSpan
-    protected Flowable<List<Membership>> fetchMemberships(String groupId, String nextPageToken,
+    protected Flowable<List<Membership>> fetchMemberships(@SpanAttribute String groupId, @SpanAttribute String nextPageToken,
                                                         List<Membership> allMemberships) {
         if (groupId == null || groupId.isEmpty()) {
             return Flowable.just(allMemberships);
