@@ -67,6 +67,7 @@ public class PseudoController {
     public HttpResponse<Flowable<byte[]>> pseudonymizeField(@Schema(implementation = PseudoFieldRequest.class) String request) {
         PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
         Span currentSpan = Span.current();
+        log.info("Is SpanContext valid??? {}", currentSpan.getSpanContext().isValid());
         if (currentSpan.getSpanContext().isValid() && req != null) {
             currentSpan.setAttribute("pseudoRequest.field", req.getName());
             currentSpan.setAttribute("pseudoRequest.pattern", req.getPattern());
@@ -74,6 +75,7 @@ public class PseudoController {
             if (values != null) {
                 currentSpan.setAttribute("pseudoRequest.values.count", values.size());
                 currentSpan.setAttribute("pseudoRequest.values", values.toString());
+                Span.current().setAttribute("pseudoRequest.values", values.toString());
             }
         }
         log.info(Strings.padEnd(String.format("*** Pseudonymize field: %s ", req.getName()), 80, '*'));
