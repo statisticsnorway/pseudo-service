@@ -9,7 +9,6 @@ import io.micronaut.http.hateoas.Link;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.tracing.annotation.NewSpan;
 import io.reactivex.Flowable;
 import io.opentelemetry.api.trace.Span;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +27,7 @@ import no.ssb.dlp.pseudo.service.sid.InvalidSidSnapshotDateException;
 import no.ssb.dlp.pseudo.service.sid.SidIndexUnavailableException;
 
 import no.ssb.dlp.pseudo.service.tracing.WithSpan;
+import no.ssb.dlp.pseudo.service.tracing.WithSpanSupport;
 import org.slf4j.MDC;
 
 import java.lang.reflect.InvocationTargetException;
@@ -61,14 +61,13 @@ public class PseudoController {
      */
 
     @WithSpan
-    @NewSpan("pseudonymizeField (micronaut)")
     @Operation(summary = "Pseudonymize field", description = "Pseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Post(value = "/pseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
     public HttpResponse<Flowable<byte[]>> pseudonymizeField(@Schema(implementation = PseudoFieldRequest.class) String request) {
         PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
-        Span currentSpan = Span.current();
+        final var currentSpan = WithSpanSupport.currentWithSpan();
         if (currentSpan.getSpanContext().isValid() && req != null) {
             currentSpan.setAttribute("pseudoRequest.field", req.getName());
             currentSpan.setAttribute("pseudoRequest.pattern", req.getPattern());

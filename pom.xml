@@ -441,11 +441,6 @@
               </path>
               <path>
                 <groupId>io.micronaut.tracing</groupId>
-                <artifactId>micronaut-tracing-annotation</artifactId>
-                <version>${micronaut.tracing.version}</version>
-              </path>
-              <path>
-                <groupId>io.micronaut.tracing</groupId>
                 <artifactId>micronaut-tracing-opentelemetry-annotation</artifactId>
                 <version>${micronaut.tracing.version}</version>
               </path>

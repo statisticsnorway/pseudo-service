@@ -41,7 +41,7 @@ public final class WithSpanInterceptor implements MethodInterceptor<Object, Obje
                 .setSpanKind(SpanKind.INTERNAL)
                 .startSpan();
 
-        try (Scope scope = span.makeCurrent()) {
+        try (Scope scope = WithSpanSupport.withSpan(Context.current(), span).makeCurrent()) {
             addSpanAttributes(span, context);
             result = context.proceed();
         } catch (Exception e) {
