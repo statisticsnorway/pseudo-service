@@ -13,6 +13,8 @@ import io.opentelemetry.context.ContextKey;
 public final class WithSpanContext {
     private static final ContextKey<Span> WITH_SPAN_KEY = ContextKey.named("pseudo.withspan.span");
 
+    private WithSpanContext(){ }
+
     public static Span currentSpan() {
         Span span = Context.current().get(WITH_SPAN_KEY);
         return span != null ? span : Span.current();

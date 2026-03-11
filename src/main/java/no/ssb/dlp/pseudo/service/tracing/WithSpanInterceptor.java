@@ -110,18 +110,18 @@ public final class WithSpanInterceptor implements MethodInterceptor<Object, Obje
         }
     }
 
-    private static void setAttribute(Span span, String name, Object value) {
+    private static void setAttribute(Span span, String attributeName, Object value) {
         switch (value) {
-            case String stringValue -> span.setAttribute(name, stringValue);
-            case Boolean booleanValue -> span.setAttribute(name, booleanValue);
-            case Long longValue -> span.setAttribute(name, longValue);
-            case Integer intValue -> span.setAttribute(name, intValue.longValue());
-            case Short shortValue -> span.setAttribute(name, shortValue.longValue());
-            case Byte byteValue -> span.setAttribute(name, byteValue.longValue());
-            case Double doubleValue -> span.setAttribute(name, doubleValue);
-            case Float floatValue -> span.setAttribute(name, floatValue.doubleValue());
-            case Character charValue -> span.setAttribute(name, String.valueOf(charValue));
-            default -> span.setAttribute(name, String.valueOf(value));
+            case String stringValue -> span.setAttribute(attributeName, stringValue);
+            case Boolean booleanValue -> span.setAttribute(attributeName, booleanValue);
+            case Long longValue -> span.setAttribute(attributeName, longValue);
+            case Integer intValue -> span.setAttribute(attributeName, intValue.longValue());
+            case Short shortValue -> span.setAttribute(attributeName, shortValue.longValue());
+            case Byte byteValue -> span.setAttribute(attributeName, byteValue.longValue());
+            case Double doubleValue -> span.setAttribute(attributeName, doubleValue);
+            case Float floatValue -> span.setAttribute(attributeName, floatValue.doubleValue());
+            case Character charValue -> span.setAttribute(attributeName, String.valueOf(charValue));
+            case null, default -> span.setAttribute(attributeName, String.valueOf(value));
         }
     }
 }

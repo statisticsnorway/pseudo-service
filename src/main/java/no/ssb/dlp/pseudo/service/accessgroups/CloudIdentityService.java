@@ -1,7 +1,6 @@
 package no.ssb.dlp.pseudo.service.accessgroups;
 
 import io.micronaut.cache.annotation.Cacheable;
-import io.opentelemetry.api.trace.Span;
 import io.reactivex.Flowable;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
