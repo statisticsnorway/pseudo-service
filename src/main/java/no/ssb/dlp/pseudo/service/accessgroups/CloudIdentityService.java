@@ -1,12 +1,11 @@
 package no.ssb.dlp.pseudo.service.accessgroups;
 
 import io.micronaut.cache.annotation.Cacheable;
-import io.opentelemetry.api.trace.Span;
+import io.micronaut.tracing.annotation.NewSpan;
+import io.micronaut.tracing.annotation.SpanTag;
 import io.reactivex.Flowable;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import no.ssb.dlp.pseudo.service.tracing.SpanAttribute;
-import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +15,9 @@ import java.util.List;
 public class CloudIdentityService {
     private final CloudIdentityClient cloudIdentityClient;
 
-    @WithSpan
+    @NewSpan
     @Cacheable(value = "cloud-identity-service-cache", parameters = {"groupEmail"})
-    public List<Membership> listMembers(@SpanAttribute String groupEmail) {
+    public List<Membership> listMembers(@SpanTag String groupEmail) {
         return Flowable.fromPublisher(cloudIdentityClient.lookup(groupEmail))
                 .flatMap(lookupResponse -> fetchMemberships(lookupResponse.getGroupName(), null,
                         new ArrayList<>()))
@@ -33,10 +32,10 @@ public class CloudIdentityService {
      * @param allMemberships a list that will be populated with all memberships
      * @return the list of all memberships
      */
-    @WithSpan
+    @NewSpan
     protected Flowable<List<Membership>> fetchMemberships(
-            @SpanAttribute String groupId,
-            @SpanAttribute String nextPageToken,
+            @SpanTag String groupId,
+            @SpanTag String nextPageToken,
             List<Membership> allMemberships
     ) {
         if (groupId == null || groupId.isEmpty()) {

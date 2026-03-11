@@ -2,7 +2,10 @@ package no.ssb.dlp.pseudo.service.pseudo;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.crypto.tink.Aead;
+import io.micronaut.tracing.annotation.NewSpan;
+import io.micronaut.tracing.annotation.SpanTag;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +32,6 @@ import no.ssb.dlp.pseudo.core.tink.model.EncryptedKeysetWrapper;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.FieldMetadata;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.FieldMetric;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.PseudoMetadataProcessor;
-import no.ssb.dlp.pseudo.service.tracing.SpanAttribute;
-import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,9 +49,10 @@ import static no.ssb.dlp.pseudo.service.sid.SidMapper.*;
 public class RecordMapProcessorFactory {
     private final PseudoSecrets pseudoSecrets;
     private final LoadingCache<String, Aead> aeadCache;
+    private final Tracer tracer;
 
-    @WithSpan
-    public RecordMapProcessor<PseudoMetadataProcessor> newPseudonymizeRecordProcessor(@SpanAttribute List<PseudoConfig> pseudoConfigs, String correlationId) {
+    @NewSpan
+    public RecordMapProcessor<PseudoMetadataProcessor> newPseudonymizeRecordProcessor(@SpanTag List<PseudoConfig> pseudoConfigs, String correlationId) {
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
 
@@ -66,7 +68,7 @@ public class RecordMapProcessorFactory {
         return new RecordMapProcessor<>(chain, metadataProcessor);
     }
 
-    @WithSpan
+    @NewSpan
     public RecordMapProcessor<PseudoMetadataProcessor> newDepseudonymizeRecordProcessor(List<PseudoConfig> pseudoConfigs, String correlationId) {
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
@@ -81,7 +83,7 @@ public class RecordMapProcessorFactory {
         return new RecordMapProcessor<>(chain, metadataProcessor);
     }
 
-    @WithSpan
+    @NewSpan
     public RecordMapProcessor<PseudoMetadataProcessor> newRepseudonymizeRecordProcessor(PseudoConfig sourcePseudoConfig,
                                                                                         PseudoConfig targetPseudoConfig, String correlationId) {
         final PseudoFuncs fieldDepseudonymizer = newPseudoFuncs(sourcePseudoConfig.getRules(),
@@ -110,15 +112,16 @@ public class RecordMapProcessorFactory {
         return varValue;
     }
 
-    @WithSpan
-    protected String process(PseudoOperation operation,
+    private String process(PseudoOperation operation,
                            PseudoFuncs func,
                            FieldDescriptor field,
                            String varValue,
                            PseudoMetadataProcessor metadataProcessor) {
+        Span span = tracer.spanBuilder("process").startSpan();
         PseudoFuncRuleMatch match = func.findPseudoFunc(field).orElse(null);
 
         if (match == null) {
+            span.end();
             return varValue;
         }
         if (varValue == null) {
@@ -126,6 +129,7 @@ public class RecordMapProcessorFactory {
             if (!(match.getFunc() instanceof MapFunc)) {
                 metadataProcessor.addMetric(FieldMetric.NULL_VALUE);
             }
+            span.end();
             return varValue;
         }
         try {
@@ -188,6 +192,8 @@ public class RecordMapProcessorFactory {
         } catch (Exception e) {
             throw new PseudoException(String.format("pseudonymize error - field='%s', originalValue='%s'",
                     field.getPath(), varValue), e);
+        } finally {
+            span.end();
         }
     }
 
