@@ -27,7 +27,7 @@ import no.ssb.dlp.pseudo.service.sid.InvalidSidSnapshotDateException;
 import no.ssb.dlp.pseudo.service.sid.SidIndexUnavailableException;
 
 import no.ssb.dlp.pseudo.service.tracing.WithSpan;
-import no.ssb.dlp.pseudo.service.tracing.WithSpanSupport;
+import no.ssb.dlp.pseudo.service.tracing.WithSpanContext;
 import org.slf4j.MDC;
 
 import java.lang.reflect.InvocationTargetException;
@@ -67,8 +67,8 @@ public class PseudoController {
     @ExecuteOn(TaskExecutors.BLOCKING)
     public HttpResponse<Flowable<byte[]>> pseudonymizeField(@Schema(implementation = PseudoFieldRequest.class) String request) {
         PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
-        final var currentSpan = WithSpanSupport.currentWithSpan();
-        if (currentSpan.getSpanContext().isValid() && req != null) {
+        final var currentSpan = WithSpanContext.currentSpan();
+        if (req != null) {
             currentSpan.setAttribute("pseudoRequest.field", req.getName());
             currentSpan.setAttribute("pseudoRequest.pattern", req.getPattern());
             final var values = req.getValues();

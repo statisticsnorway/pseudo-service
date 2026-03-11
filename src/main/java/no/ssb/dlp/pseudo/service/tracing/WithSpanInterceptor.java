@@ -41,7 +41,7 @@ public final class WithSpanInterceptor implements MethodInterceptor<Object, Obje
                 .setSpanKind(SpanKind.INTERNAL)
                 .startSpan();
 
-        try (Scope scope = WithSpanSupport.withSpan(Context.current(), span).makeCurrent()) {
+        try (Scope scope = WithSpanContext.withSpan(Context.current(), span).makeCurrent()) {
             addSpanAttributes(span, context);
             result = context.proceed();
         } catch (Exception e) {
@@ -112,9 +112,6 @@ public final class WithSpanInterceptor implements MethodInterceptor<Object, Obje
 
     private static void setAttribute(Span span, String name, Object value) {
         switch (value) {
-            case null -> {
-                return;
-            }
             case String stringValue -> span.setAttribute(name, stringValue);
             case Boolean booleanValue -> span.setAttribute(name, booleanValue);
             case Long longValue -> span.setAttribute(name, longValue);

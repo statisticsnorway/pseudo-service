@@ -34,8 +34,11 @@ public class CloudIdentityService {
      * @return the list of all memberships
      */
     @WithSpan
-    protected Flowable<List<Membership>> fetchMemberships(@SpanAttribute String groupId, @SpanAttribute String nextPageToken,
-                                                        List<Membership> allMemberships) {
+    protected Flowable<List<Membership>> fetchMemberships(
+            @SpanAttribute String groupId,
+            @SpanAttribute String nextPageToken,
+            List<Membership> allMemberships
+    ) {
         if (groupId == null || groupId.isEmpty()) {
             return Flowable.just(allMemberships);
         }

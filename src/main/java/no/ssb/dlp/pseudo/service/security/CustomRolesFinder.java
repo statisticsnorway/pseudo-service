@@ -26,7 +26,6 @@ import java.util.*;
         @Requires(notEquals = "endpoints.cloud-run.enabled", value = "true")
 })
 @Slf4j
-@WithSpan
 public class CustomRolesFinder implements RolesFinder {
 
     private final TokenConfiguration tokenConfiguration;
@@ -34,6 +33,7 @@ public class CustomRolesFinder implements RolesFinder {
     private final CloudIdentityService cloudIdentityService;
 
     @Override
+    @WithSpan
     public List<String> resolveRoles(Map<String, Object> attributes) {
         List<String> roles = new ArrayList<>();
         boolean trustedIssuer = isTrustedIssuer(attributes);

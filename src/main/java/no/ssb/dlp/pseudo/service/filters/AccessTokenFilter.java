@@ -10,14 +10,13 @@ import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.filter.ClientFilterChain;
 import io.micronaut.http.filter.HttpClientFilter;
 import io.micronaut.inject.qualifiers.Qualifiers;
-import io.opentelemetry.api.trace.Span;
 import jakarta.annotation.Nullable;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import no.ssb.dlp.pseudo.service.tracing.WithSpan;
-import no.ssb.dlp.pseudo.service.tracing.WithSpanSupport;
+import no.ssb.dlp.pseudo.service.tracing.WithSpanContext;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -60,7 +59,7 @@ public class AccessTokenFilter implements HttpClientFilter {
     @SneakyThrows
     @WithSpan
     public Publisher<? extends HttpResponse<?>> doFilter(MutableHttpRequest<?> request, ClientFilterChain chain) {
-        final var currentSpan = WithSpanSupport.currentWithSpan();
+        final var currentSpan = WithSpanContext.currentSpan();
         currentSpan.setAttribute("request.url", request.getUri().toString());
         final var config = request.getAttribute("micronaut.http.serviceId").map(Object::toString).flatMap(this::getConfig);
         currentSpan.addEvent("Add bearer auth", Instant.now());
