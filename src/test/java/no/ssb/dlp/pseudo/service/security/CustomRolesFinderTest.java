@@ -4,7 +4,6 @@ import com.nimbusds.jwt.JWTClaimNames;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.token.config.TokenConfiguration;
 import io.micronaut.security.token.config.TokenConfigurationProperties;
-import net.bytebuddy.utility.JavaConstant;
 import no.ssb.dlp.pseudo.service.accessgroups.CloudIdentityService;
 import no.ssb.dlp.pseudo.service.accessgroups.EntityKey;
 import no.ssb.dlp.pseudo.service.accessgroups.Membership;
@@ -22,7 +21,7 @@ class CustomRolesFinderTest {
     CloudIdentityService cloudIdentityService = mock(CloudIdentityService.class);
     StaticRolesConfig rolesConfig = mock(StaticRolesConfig.class);
     TokenConfiguration tokenConfig = new TokenConfigurationProperties();
-    CustomRolesFinder sut = new CustomRolesFinder(tokenConfig, rolesConfig, cloudIdentityService);
+    CustomRolesFinder sut = new CustomRolesFinder(tokenConfig, rolesConfig, cloudIdentityService, null);
 
     @Test
     void single_user_gets_no_roles() {
@@ -98,7 +97,7 @@ class CustomRolesFinderTest {
         when(rolesConfig.getTrustedIssuers()).thenReturn(List.of(trusted_issuer));
         when(tokenConfig.getNameKey()).thenReturn("email");
 
-        CustomRolesFinder finder = new CustomRolesFinder(tokenConfig, this.rolesConfig, this.cloudIdentityService);
+        CustomRolesFinder finder = new CustomRolesFinder(tokenConfig, this.rolesConfig, this.cloudIdentityService, null);
         assertIterableEquals(List.of(PseudoServiceRole.USER),
                 finder.resolveRoles(Map.of("sub", user, JWTClaimNames.ISSUER, trusted_issuer)));
     }
