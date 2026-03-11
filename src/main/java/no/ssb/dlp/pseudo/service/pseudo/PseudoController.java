@@ -71,6 +71,7 @@ public class PseudoController {
         if (req != null) {
             currentSpan.setAttribute("pseudoRequest.field", req.getName());
             currentSpan.setAttribute("pseudoRequest.pattern", req.getPattern());
+            currentSpan.setAttribute("pseudoRequest.pseudoFunc", req.getPseudoFunc());
             final var values = req.getValues();
             if (values != null) {
                 currentSpan.setAttribute("pseudoRequest.values.count", values.size());

@@ -2,7 +2,6 @@ package no.ssb.dlp.pseudo.service.pseudo;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.crypto.tink.Aead;
-import io.opentelemetry.api.trace.Span;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
