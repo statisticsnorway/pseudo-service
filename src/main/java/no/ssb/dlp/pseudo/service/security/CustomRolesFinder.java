@@ -9,13 +9,12 @@ import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.token.DefaultRolesFinder;
 import io.micronaut.security.token.RolesFinder;
 import io.micronaut.security.token.config.TokenConfiguration;
-import io.micronaut.tracing.annotation.NewSpan;
-import io.opentelemetry.api.trace.Tracer;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.ssb.dlp.pseudo.service.accessgroups.CloudIdentityService;
 import no.ssb.dlp.pseudo.service.accessgroups.Membership;
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.*;
 
@@ -32,10 +31,9 @@ public class CustomRolesFinder implements RolesFinder {
     private final TokenConfiguration tokenConfiguration;
     private final StaticRolesConfig rolesConfig;
     private final CloudIdentityService cloudIdentityService;
-    private final Tracer tracer;
 
     @Override
-    @NewSpan
+    @WithSpan
     public List<String> resolveRoles(Map<String, Object> attributes) {
         List<String> roles = new ArrayList<>();
         boolean trustedIssuer = isTrustedIssuer(attributes);

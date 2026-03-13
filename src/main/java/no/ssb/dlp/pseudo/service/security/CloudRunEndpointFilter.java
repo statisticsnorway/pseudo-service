@@ -7,8 +7,8 @@ import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
-import io.micronaut.tracing.annotation.NewSpan;
 import io.reactivex.Flowable;
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 import org.reactivestreams.Publisher;
 
 import jakarta.inject.Singleton;
@@ -33,7 +33,7 @@ public class CloudRunEndpointFilter implements HttpServerFilter {
      * @return A publisher that emits a mutable HTTP response that represents the server's response.
      */
     @Override
-    @NewSpan
+    @WithSpan
     public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
         String path = request.getUri().getPath();
         if (path.equals("/pseudonymize/file") || path.equals("/pseudonymize/field")) {

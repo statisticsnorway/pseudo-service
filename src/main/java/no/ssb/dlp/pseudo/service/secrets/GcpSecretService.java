@@ -6,11 +6,11 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.gcp.condition.RequiresGoogleProjectId;
 import io.micronaut.gcp.secretmanager.client.SecretManagerClient;
 import io.micronaut.gcp.secretmanager.client.VersionedSecret;
-import io.micronaut.tracing.annotation.NewSpan;
 import jakarta.inject.Singleton;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.Optional;
 
@@ -47,7 +47,7 @@ public class GcpSecretService implements SecretService {
         return fetchSecret(secretId, version);
     }
 
-    @NewSpan
+    @WithSpan
     byte[] fetchSecret(String secretId, String version) {
         // Get key from overrides map if it is defined
         if (config.getOverrides().containsKey(secretId)) {

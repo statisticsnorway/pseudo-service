@@ -142,6 +142,10 @@
       <artifactId>opentelemetry-exporter-otlp</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.opentelemetry.instrumentation</groupId>
+      <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.micronaut.cache</groupId>
       <artifactId>micronaut-cache-core</artifactId>
       <scope>compile</scope>
@@ -434,6 +438,11 @@
                 <groupId>io.micronaut.openapi</groupId>
                 <artifactId>micronaut-openapi</artifactId>
                 <version>${micronaut.openapi.version}</version>
+              </path>
+              <path>
+                <groupId>io.micronaut.tracing</groupId>
+                <artifactId>micronaut-tracing-opentelemetry-annotation</artifactId>
+                <version>${micronaut.tracing.version}</version>
               </path>
               <path>
                 <groupId>com.google.auto.service</groupId>
