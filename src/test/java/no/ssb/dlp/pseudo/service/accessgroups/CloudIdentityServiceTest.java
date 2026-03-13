@@ -3,6 +3,8 @@ package no.ssb.dlp.pseudo.service.accessgroups;
 import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
@@ -21,6 +23,11 @@ public class CloudIdentityServiceTest {
     @MockBean(CloudIdentityClient.class)
     CloudIdentityClient cloudIdentityClient() {
         return mock(CloudIdentityClient.class);
+    }
+
+    @MockBean(Tracer.class)
+    Tracer tracer() {
+        return OpenTelemetry.noop().getTracer("test");
     }
 
     @Test
