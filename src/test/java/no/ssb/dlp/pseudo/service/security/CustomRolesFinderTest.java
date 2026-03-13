@@ -4,7 +4,8 @@ import com.nimbusds.jwt.JWTClaimNames;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.token.config.TokenConfiguration;
 import io.micronaut.security.token.config.TokenConfigurationProperties;
-import net.bytebuddy.utility.JavaConstant;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
 import no.ssb.dlp.pseudo.service.accessgroups.CloudIdentityService;
 import no.ssb.dlp.pseudo.service.accessgroups.EntityKey;
 import no.ssb.dlp.pseudo.service.accessgroups.Membership;
@@ -20,27 +21,36 @@ import static org.mockito.Mockito.*;
 class CustomRolesFinderTest {
 
     CloudIdentityService cloudIdentityService = mock(CloudIdentityService.class);
+
     StaticRolesConfig rolesConfig = mock(StaticRolesConfig.class);
+
     TokenConfiguration tokenConfig = new TokenConfigurationProperties();
-    CustomRolesFinder sut = new CustomRolesFinder(tokenConfig, rolesConfig, cloudIdentityService);
+
+    Tracer tracer() { return OpenTelemetry.noop().getTracer("test"); }
+
+    /**
+     * We manually construct all the beans here because {@link CustomRolesFinder} cannot be instantiated through
+     * Micronaut AOP in the Micronaut TEST environment due to its {@code @Requires} annotation.
+     */
+    CustomRolesFinder rolesFinder = new CustomRolesFinder(tokenConfig, rolesConfig, cloudIdentityService, tracer());
 
     @Test
     void single_user_gets_no_roles() {
         final String email = "john.doe@ssb.no";
-        assertIterableEquals(List.of(), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
+        assertIterableEquals(List.of(), rolesFinder.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
     @Test
     void single_user_get_user_role() {
         final String email = "john.doe@ssb.no";
         when(rolesConfig.getUsers()).thenReturn(List.of(email));
-        assertIterableEquals(List.of(PseudoServiceRole.USER), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
+        assertIterableEquals(List.of(PseudoServiceRole.USER), rolesFinder.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
     void single_user_get_admin_role() {
         final String email = "john.doe@ssb.no";
         when(rolesConfig.getAdmins()).thenReturn(List.of(email));
-        assertIterableEquals(List.of(PseudoServiceRole.ADMIN), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
+        assertIterableEquals(List.of(PseudoServiceRole.ADMIN), rolesFinder.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
@@ -48,7 +58,7 @@ class CustomRolesFinderTest {
         final String email = "john.doe@ssb.no";
         when(rolesConfig.getUsers()).thenReturn(List.of(email));
         when(rolesConfig.getAdmins()).thenReturn(List.of(email));
-        assertIterableEquals(List.of(PseudoServiceRole.ADMIN, PseudoServiceRole.USER), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
+        assertIterableEquals(List.of(PseudoServiceRole.ADMIN, PseudoServiceRole.USER), rolesFinder.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
@@ -58,7 +68,7 @@ class CustomRolesFinderTest {
         when(rolesConfig.getUsersGroup()).thenReturn(Optional.of(user_group));
         when(cloudIdentityService.listMembers(eq(user_group)))
                 .thenReturn(List.of(new Membership("John Doe", new EntityKey(email, "ssb"))));
-        assertIterableEquals(List.of(PseudoServiceRole.USER), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
+        assertIterableEquals(List.of(PseudoServiceRole.USER), rolesFinder.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
@@ -68,14 +78,14 @@ class CustomRolesFinderTest {
         when(rolesConfig.getAdminsGroup()).thenReturn(Optional.of(user_group));
         when(cloudIdentityService.listMembers(eq(user_group)))
                 .thenReturn(List.of(new Membership("John Doe", new EntityKey(email, "ssb"))));
-        assertIterableEquals(List.of(PseudoServiceRole.ADMIN), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
+        assertIterableEquals(List.of(PseudoServiceRole.ADMIN), rolesFinder.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
     void authenticated_user_gets_no_roles_when_issuer_not_trusted() {
         final String email = "john.doe@ssb.no";
         when(rolesConfig.getUsers()).thenReturn(List.of(SecurityRule.IS_AUTHENTICATED));
-        assertIterableEquals(List.of(), sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
+        assertIterableEquals(List.of(), rolesFinder.resolveRoles(Map.of(tokenConfig.getNameKey(), email)));
     }
 
     @Test
@@ -85,7 +95,7 @@ class CustomRolesFinderTest {
         when(rolesConfig.getUsers()).thenReturn(List.of(SecurityRule.IS_AUTHENTICATED));
         when(rolesConfig.getTrustedIssuers()).thenReturn(List.of(trusted_issuer));
         assertIterableEquals(List.of(PseudoServiceRole.USER),
-                sut.resolveRoles(Map.of(tokenConfig.getNameKey(), email, JWTClaimNames.ISSUER, trusted_issuer)));
+                rolesFinder.resolveRoles(Map.of(tokenConfig.getNameKey(), email, JWTClaimNames.ISSUER, trusted_issuer)));
     }
 
     @Test
@@ -98,7 +108,7 @@ class CustomRolesFinderTest {
         when(rolesConfig.getTrustedIssuers()).thenReturn(List.of(trusted_issuer));
         when(tokenConfig.getNameKey()).thenReturn("email");
 
-        CustomRolesFinder finder = new CustomRolesFinder(tokenConfig, this.rolesConfig, this.cloudIdentityService);
+        CustomRolesFinder finder = new CustomRolesFinder(tokenConfig, this.rolesConfig, this.cloudIdentityService, null);
         assertIterableEquals(List.of(PseudoServiceRole.USER),
                 finder.resolveRoles(Map.of("sub", user, JWTClaimNames.ISSUER, trusted_issuer)));
     }

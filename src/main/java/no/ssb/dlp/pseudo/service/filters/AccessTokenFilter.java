@@ -10,13 +10,14 @@ import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.filter.ClientFilterChain;
 import io.micronaut.http.filter.HttpClientFilter;
 import io.micronaut.inject.qualifiers.Qualifiers;
+import io.micronaut.tracing.annotation.NewSpan;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
 import jakarta.annotation.Nullable;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
-import no.ssb.dlp.pseudo.service.tracing.WithSpan;
-import no.ssb.dlp.pseudo.service.tracing.WithSpanContext;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -43,9 +44,10 @@ public class AccessTokenFilter implements HttpClientFilter {
     @Value("${gcp.http.client.filter.project-id}")
     private String projectId;
     private final GoogleCredentials credentials;
+    private final Tracer tracer;
 
     @SneakyThrows
-    public AccessTokenFilter(@Nullable @Value("${gcp.http.client.filter.credentials-path}") String credentialsPath) {
+    public AccessTokenFilter(@Nullable @Value("${gcp.http.client.filter.credentials-path}") String credentialsPath, Tracer tracer) {
         if (credentialsPath == null) {
             log.info("Using Application Default Credentials");
             this.credentials = GoogleCredentials.getApplicationDefault();
@@ -54,12 +56,13 @@ public class AccessTokenFilter implements HttpClientFilter {
             this.credentials = GoogleCredentials.fromStream(
                     new FileInputStream(credentialsPath));
         }
+        this.tracer = tracer;
     }
 
     @SneakyThrows
-    @WithSpan
+    @NewSpan
     public Publisher<? extends HttpResponse<?>> doFilter(MutableHttpRequest<?> request, ClientFilterChain chain) {
-        final var currentSpan = WithSpanContext.currentSpan();
+        final var currentSpan = Span.current();
         currentSpan.setAttribute("request.url", request.getUri().toString());
         final var config = request.getAttribute("micronaut.http.serviceId").map(Object::toString).flatMap(this::getConfig);
         currentSpan.addEvent("Add bearer auth", Instant.now());
@@ -83,18 +86,20 @@ public class AccessTokenFilter implements HttpClientFilter {
     }
 
     @SneakyThrows
-    @WithSpan
-    protected String getAccessToken(String audience) {
-        return credentials.createScoped(audience).refreshAccessToken().getTokenValue();
+    private String getAccessToken(String audience) {
+        Span span = tracer.spanBuilder("getAccessToken").startSpan();
+        final var result = credentials.createScoped(audience).refreshAccessToken().getTokenValue();
+        span.end();
+        return result;
     }
 
-    @Cacheable(value="access-token-filter-cache", parameters = {"serviceId"})
-    @WithSpan
+    @Cacheable(value = "access-token-filter-cache", parameters = {"serviceId"})
+    @NewSpan
     protected Optional<AccessTokenFilterConfig> getConfig(String serviceId) {
         return Optional
                 .ofNullable(applicationContext)
                 .flatMap(ac ->
-                    ac.findBean(AccessTokenFilterConfig.class, Qualifiers.byName(serviceId))
+                        ac.findBean(AccessTokenFilterConfig.class, Qualifiers.byName(serviceId))
                 );
     }
 

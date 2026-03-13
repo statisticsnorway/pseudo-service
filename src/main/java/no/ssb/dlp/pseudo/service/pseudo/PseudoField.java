@@ -1,11 +1,7 @@
 package no.ssb.dlp.pseudo.service.pseudo;
 
 import com.google.common.base.Stopwatch;
-import io.opentelemetry.api.GlobalOpenTelemetry;
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Scope;
-import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
-import io.opentelemetry.instrumentation.annotations.SpanAttribute;
+import io.micronaut.tracing.annotation.NewSpan;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import lombok.AccessLevel;
@@ -20,7 +16,6 @@ import no.ssb.dlp.pseudo.core.tink.model.EncryptedKeysetWrapper;
 import no.ssb.dlp.pseudo.core.util.Json;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.FieldMetric;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.PseudoMetadataProcessor;
-import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.List;
 import java.util.Map;
@@ -87,7 +82,7 @@ public class PseudoField {
      * @param values                 The values to be processed.
      * @return A Flowable stream that processes the field values by applying the configured pseudo rules, and returns them as a lists of strings.
      */
-    @WithSpan
+    @NewSpan
     public Flowable<String> process(PseudoConfigSplitter pseudoConfigSplitter,
                                     RecordMapProcessorFactory recordProcessorFactory,
                                     List<String> values,
@@ -137,7 +132,7 @@ public class PseudoField {
      * @param values                 The values to be processed.
      * @return A Flowable stream that processes the field values by applying the configured pseudo rules, and returns them as a lists of strings.
      */
-    @WithSpan
+    @NewSpan
     public Flowable<String> process(RecordMapProcessorFactory recordProcessorFactory,
                                     List<String> values,
                                     PseudoField targetPseudoField,

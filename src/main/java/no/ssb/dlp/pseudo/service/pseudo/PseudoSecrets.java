@@ -1,10 +1,10 @@
 package no.ssb.dlp.pseudo.service.pseudo;
 
 import io.micronaut.context.annotation.Property;
+import io.micronaut.tracing.annotation.NewSpan;
 import jakarta.inject.Singleton;
 import no.ssb.dlp.pseudo.core.PseudoSecret;
 import no.ssb.dlp.pseudo.service.secrets.SecretService;
-import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.List;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class PseudoSecrets {
      * @param configuredPseudoSecrets a Map named pseudo secrets
      * @return a List of cleaned up, resolved pseudo secrets
      */
-    @WithSpan
+    @NewSpan
     List<PseudoSecret> resolvePseudoSecrets(Map<String, PseudoSecret> configuredPseudoSecrets) {
         if (configuredPseudoSecrets == null) {
             return List.of();

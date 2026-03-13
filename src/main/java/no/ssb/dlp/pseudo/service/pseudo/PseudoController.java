@@ -9,6 +9,8 @@ import io.micronaut.http.hateoas.Link;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.security.annotation.Secured;
+import io.micronaut.tracing.annotation.NewSpan;
+import io.opentelemetry.api.trace.Tracer;
 import io.reactivex.Flowable;
 import io.opentelemetry.api.trace.Span;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,8 +28,6 @@ import no.ssb.dlp.pseudo.service.security.PseudoServiceRole;
 import no.ssb.dlp.pseudo.service.sid.InvalidSidSnapshotDateException;
 import no.ssb.dlp.pseudo.service.sid.SidIndexUnavailableException;
 
-import no.ssb.dlp.pseudo.service.tracing.WithSpan;
-import no.ssb.dlp.pseudo.service.tracing.WithSpanContext;
 import org.slf4j.MDC;
 
 import java.lang.reflect.InvocationTargetException;
@@ -52,6 +52,7 @@ public class PseudoController {
     private final StreamProcessorFactory streamProcessorFactory;
     private final RecordMapProcessorFactory recordProcessorFactory;
     private final PseudoConfigSplitter pseudoConfigSplitter;
+    private final Tracer tracer;
 
     /**
      * Pseudonymizes a field.
@@ -60,14 +61,14 @@ public class PseudoController {
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
 
-    @WithSpan
+    @NewSpan
     @Operation(summary = "Pseudonymize field", description = "Pseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Post(value = "/pseudonymize/field", consumes = MediaType.APPLICATION_JSON)
     @ExecuteOn(TaskExecutors.BLOCKING)
     public HttpResponse<Flowable<byte[]>> pseudonymizeField(@Schema(implementation = PseudoFieldRequest.class) String request) {
         PseudoFieldRequest req = Json.toObject(PseudoFieldRequest.class, request);
-        final var currentSpan = WithSpanContext.currentSpan();
+        final var currentSpan = Span.current();
         if (req != null) {
             currentSpan.setAttribute("pseudoRequest.field", req.getName());
             currentSpan.setAttribute("pseudoRequest.pattern", req.getPattern());
@@ -76,7 +77,6 @@ public class PseudoController {
             if (values != null) {
                 currentSpan.setAttribute("pseudoRequest.values.count", values.size());
                 currentSpan.setAttribute("pseudoRequest.values", values.toString());
-                Span.current().setAttribute("pseudoRequest.values", values.toString());
             }
         }
         log.info(Strings.padEnd(String.format("*** Pseudonymize field: %s ", req.getName()), 80, '*'));
@@ -108,7 +108,7 @@ public class PseudoController {
      * @param request JSON string representing a {@link DepseudoFieldRequest} object.
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
-    @WithSpan
+    @NewSpan
     @Operation(summary = "Depseudonymize field", description = "Depseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Secured({PseudoServiceRole.ADMIN})
@@ -117,7 +117,7 @@ public class PseudoController {
     public HttpResponse<Flowable<byte[]>> depseudonymizeField(@Schema(implementation = DepseudoFieldRequest.class) String request) {
         DepseudoFieldRequest req = Json.toObject(DepseudoFieldRequest.class, request);
         Span currentSpan = Span.current();
-        if (currentSpan.getSpanContext().isValid() && req != null) {
+        if (req != null) {
             currentSpan.setAttribute("pseudo.field", req.getName());
             currentSpan.setAttribute("pseudo.pattern", req.getPattern());
             currentSpan.setAttribute("pseudo.values.count", req.getValues() == null ? 0 : req.getValues().size());
@@ -140,7 +140,7 @@ public class PseudoController {
      * @param request JSON string representing a {@link RepseudoFieldRequest} object.
      * @return HTTP response containing a {@link HttpResponse<Flowable>} object.
      */
-    @WithSpan
+    @NewSpan
     @Operation(summary = "Repseudonymize field", description = "Repseudonymize a field.")
     @Produces(MediaType.APPLICATION_JSON)
     @Secured({PseudoServiceRole.ADMIN})
@@ -149,7 +149,7 @@ public class PseudoController {
     public HttpResponse<Flowable<byte[]>> repseudonymizeField(@Schema(implementation = RepseudoFieldRequest.class) String request) {
         RepseudoFieldRequest req = Json.toObject(RepseudoFieldRequest.class, request);
         Span currentSpan = Span.current();
-        if (currentSpan.getSpanContext().isValid() && req != null) {
+        if (req != null) {
             currentSpan.setAttribute("pseudo.field", req.getName());
             currentSpan.setAttribute("pseudo.pattern", req.getPattern());
             currentSpan.setAttribute("pseudo.values.count", req.getValues() == null ? 0 : req.getValues().size());
