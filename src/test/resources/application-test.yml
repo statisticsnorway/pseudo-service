@@ -1,9 +1,6 @@
 micronaut:
   application.name: pseudo-service
 
-  server:
-    port: 18080
-
   http:
     services:
       sid-service:

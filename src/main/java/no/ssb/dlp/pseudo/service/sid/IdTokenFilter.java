@@ -10,6 +10,7 @@ import io.micronaut.http.filter.ClientFilterChain;
 import io.micronaut.http.filter.HttpClientFilter;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 import org.reactivestreams.Publisher;
 
 import java.io.IOException;
@@ -42,6 +43,7 @@ public class IdTokenFilter implements HttpClientFilter {
     }
 
     @Override
+    @WithSpan
     public Publisher<? extends HttpResponse<?>> doFilter(MutableHttpRequest<?> request, ClientFilterChain chain) {
         try {
             request.bearerAuth(getIdToken(request).getTokenValue());

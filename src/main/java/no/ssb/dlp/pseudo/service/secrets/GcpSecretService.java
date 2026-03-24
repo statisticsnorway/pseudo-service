@@ -10,6 +10,7 @@ import jakarta.inject.Singleton;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.Optional;
 
@@ -46,6 +47,7 @@ public class GcpSecretService implements SecretService {
         return fetchSecret(secretId, version);
     }
 
+    @WithSpan
     byte[] fetchSecret(String secretId, String version) {
         // Get key from overrides map if it is defined
         if (config.getOverrides().containsKey(secretId)) {

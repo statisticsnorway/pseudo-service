@@ -9,7 +9,7 @@ mkdir -p $CONFIG_DIR/sa-keys
 
 #create sa-keys
 touch $CONFIG_DIR/sa-keys/dev-dapla-pseudo-service-test-sa-key.json
-gcloud secrets versions access "latest" --secret="dapla-pseudo-service-sa-key" --project="ssb-team-dapla" >> private/gcp/sa-keys/dev-dapla-pseudo-service-test-sa-key.json
+gcloud secrets versions access "latest" --secret="pseudo-dev-sa-key" --project="staging-dapla-pseudo-6485" >> private/gcp/sa-keys/dev-dapla-pseudo-service-test-sa-key.json
 
 cd $REQ_DIR
 

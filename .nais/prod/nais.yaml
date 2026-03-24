@@ -14,7 +14,7 @@ spec:
   port: 10210
   terminationGracePeriodSeconds: 180
   replicas:
-    max: 10
+    max: 20
     min: 2
   resources:
     requests:
@@ -39,17 +39,23 @@ spec:
         - host: "www.googleapis.com"
         - host: "cloudidentity.googleapis.com"
         - host: "labid.lab.dapla-external.ssb.no"
-        - host: "labid.lab.dapla.ssb.no"
 
   liveness:
     path: /health/liveness
     port: 10220
+    failureThreshold: 6
+    timeout: 3
   readiness:
     path: /health/readiness
     port: 10220
+    failureThreshold: 6
+    timeout: 3
   startup:
     path: /health/readiness
     port: 10220
+    initialDelay: 30
+    failureThreshold: 10
+    timeout: 3
   
   prometheus:
     enabled: true
@@ -115,18 +121,17 @@ data:
         client:
           event-loop-group: other
           read-timeout: 60s
+          shutdown-quiet-period: 115s
+          shutdown-timeout: 120s
 
         services:
           sid-service:
             url: 'http://stable-id-lookup-service.reg-freg'
             path: '/v2'
-            read-timeout: 60s
+            read-timeout: 120s
             pool:
               enabled: true
               max-connections: 50
-            health-check: true
-            health-check-interval: 15s
-            health-check-uri: /health/ready
           cloud-identity-service:
             url: 'https://cloudidentity.googleapis.com'
             path: '/v1'
@@ -142,6 +147,11 @@ data:
             enabled: true
             descriptions: true
             step: PT1M
+
+      lifecycle:
+        graceful-shutdown:
+          enabled: true
+          grace-period: 120s
 
       caches:
         secrets:
@@ -196,8 +206,6 @@ data:
                     url: 'https://www.googleapis.com/oauth2/v3/certs'
                   lab-id-north1:
                     url: 'https://labid.lab.dapla-external.ssb.no/jwks'
-                  lab-id-west4:
-                    url: 'https://labid.lab.dapla.ssb.no/jwks'
 
         basic-auth:
           enabled: false
@@ -254,4 +262,4 @@ data:
       default-target-root: gs://ssb-prod-dapla-pseudo-service-data-export/felles
 
     sid.mapper.partition.size: 100000
-
+    

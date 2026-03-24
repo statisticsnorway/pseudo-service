@@ -4,6 +4,7 @@ import com.nimbusds.jwt.JWTClaimNames;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.token.config.TokenConfiguration;
 import io.micronaut.security.token.config.TokenConfigurationProperties;
+import net.bytebuddy.utility.JavaConstant;
 import no.ssb.dlp.pseudo.service.accessgroups.CloudIdentityService;
 import no.ssb.dlp.pseudo.service.accessgroups.EntityKey;
 import no.ssb.dlp.pseudo.service.accessgroups.Membership;

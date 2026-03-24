@@ -10,16 +10,21 @@ on:
       - ".mvn"
       - ".gitignore"
 
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+
 jobs:
   build-push:
     name: Build and push to registries
     # When releasing, the Maven release plugin will create two commits -
     # we only want this job to run once, so we exclude one of the commits.
-    if: ! contains(${{ github.event.head_commit.message }}, "prepare for next development iteration")
+    if: ${{ !contains(github.event.head_commit.message, 'prepare for next development iteration') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
+      security-events: write
 
     outputs:
       nais-tag: ${{steps.nais-deploy-vars.outputs.nais_tag}}
@@ -28,6 +33,32 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
+
+      - name: Fail build on Critical Vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          format: 'table'
+          scan-ref: '.'
+          severity: 'CRITICAL'
+          ignore-unfixed: true
+          exit-code: 1
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          skip-setup-trivy: true
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -68,9 +99,9 @@ jobs:
       - name: Maven build and install
         run: |
           if [[ ${{github.event_name}} == "release" ]]; then
-            mvn --quiet --batch-mode clean package
+            mvn --batch-mode clean package
           else
-            mvn --quiet --batch-mode -P dapla-artifact-registry deploy
+            mvn --batch-mode -P dapla-artifact-registry deploy
           fi
       
       - name: Add optional extra tag
@@ -96,15 +127,22 @@ jobs:
         id: nais-deploy-vars
         run: |
           if [[ ${{github.event_name}} == "release" ]]; then
-            echo "nais_tag=${{ steps.version-tag.outputs.version_tag }}" >> "$GITHUB_OUTPUT"
-            echo "cluster=prod" >> "$GITHUB_OUTPUT"
-            echo "nais_config_path=.nais/prod/nais.yaml" >> "$GITHUB_OUTPUT"
+            {
+              echo "nais_tag=${{ steps.version-tag.outputs.version_tag }}"
+              echo "cluster=prod"
+              echo "nais_config_path=.nais/prod/nais.yaml"
+            } >> "$GITHUB_OUTPUT"
           else
-            echo "nais_tag=${{ steps.docker-push.outputs.tag }}" >> "$GITHUB_OUTPUT"
-            echo "cluster=test" >> "$GITHUB_OUTPUT"
-            echo "nais_config_path=.nais/test/nais.yaml" >> "$GITHUB_OUTPUT"
+            {
+              echo "nais_tag=${{ steps.docker-push.outputs.tag }}"
+              echo "cluster=test"
+              echo "nais_config_path=.nais/test/nais.yaml"
+            } >> "$GITHUB_OUTPUT"
           fi
-      
+
+
+   
+
   deploy:
     name: Deploy to NAIS
     needs: build-push
@@ -130,14 +168,14 @@ jobs:
     steps:
     - name: Set env variables
       run: |
-        echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+        echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> "$GITHUB_ENV"
 
         if [[ ${{github.event_name}} == "release" ]]; then
           echo "environment=prod" >> "$GITHUB_ENV"
-          echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL_PROD }}" >> $GITHUB_ENV
+          echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL_PROD }}" >> "$GITHUB_ENV"
         else
           echo "environment=test" >> "$GITHUB_ENV"
-          echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL_TEST }}" >> $GITHUB_ENV
+          echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL_TEST }}" >> "$GITHUB_ENV"
         fi
 
     - name: Send custom JSON data to Slack workflow

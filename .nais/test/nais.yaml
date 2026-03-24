@@ -39,23 +39,34 @@ spec:
         - host: "www.googleapis.com"
         - host: "cloudidentity.googleapis.com"
         - host: "labid.lab.dapla-test-external.ssb.no"
-        - host: "labid.lab.dapla-test.ssb.no"
         - host: "labid.lab.dapla-dev-external.ssb.no"
 
   liveness:
     path: /health/liveness
     port: 10220
+    failureThreshold: 6
+    timeout: 3
   readiness:
     path: /health/readiness
     port: 10220
+    failureThreshold: 6
+    timeout: 3
   startup:
     path: /health/readiness
     port: 10220
+    initialDelay: 30
+    failureThreshold: 10
+    timeout: 3
   
   prometheus:
     enabled: true
     path: /prometheus
     port: "10220"
+
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
 
   env:
     - name: MICRONAUT_CONFIG_FILES
@@ -116,7 +127,7 @@ data:
         client:
           event-loop-group: other
           read-timeout: 60s
-
+          
         services:
           sid-service:
             url: 'http://stable-id-lookup-service.reg-freg'
@@ -149,6 +160,11 @@ data:
             enabled: true
             descriptions: true
             step: PT1M
+      
+      lifecycle:
+        graceful-shutdown:
+          enabled: true
+          grace-period: 120s
 
       router:
         static-resources:
@@ -194,13 +210,11 @@ data:
                   keycloak-nais-test:
                     url: 'https://auth.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
                   keycloak-nais-dev:
-                    url: https://auth-play.test.ssb.no/realms/ssb/protocol/openid-connect/certs
+                    url: 'https://auth-play.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
                   google:
                     url: 'https://www.googleapis.com/oauth2/v3/certs'
                   lab-id-north1-test:
                     url: 'https://labid.lab.dapla-test-external.ssb.no/jwks'
-                  lab-id-west4-test:
-                    url: 'https://labid.lab.dapla-test.ssb.no/jwks'
                   lab-id-north1-dev:
                     url: 'https://labid.lab.dapla-dev-external.ssb.no/jwks'
 
@@ -226,6 +240,13 @@ data:
         io.micronaut.security: INFO
         no.ssb.dlp.pseudo.service: INFO
         io.micronaut.security.token.jwt.validator: DEBUG
+
+        # Debugg otel tracing instrumentation and exporting
+        io.micronaut.tracing: DEBUG
+        io.micronaut.tracing.opentelemetry: DEBUG
+        io.opentelemetry: DEBUG
+        io.opentelemetry.sdk: DEBUG
+        io.opentelemetry.exporter: DEBUG
 
     services:
       secrets:
@@ -259,3 +280,7 @@ data:
       default-target-root: gs://ssb-staging-dapla-pseudo-service-data-export/felles
 
     sid.mapper.partition.size: 100000
+
+    otel:
+      traces:
+        exporter: otlp
