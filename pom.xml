@@ -9,7 +9,7 @@
   <parent>
     <groupId>io.micronaut.platform</groupId>
     <artifactId>micronaut-parent</artifactId>
-    <version>4.10.0</version>
+    <version>4.10.10</version>
   </parent>
 
   <properties>
@@ -25,7 +25,7 @@
     <dapla-datadoc-model.version>1.4</dapla-datadoc-model.version>
     <artifactregistry-maven-wagon.version>2.2.1</artifactregistry-maven-wagon.version>
     <dapla-dlp-pseudo-core.version>2.0.8</dapla-dlp-pseudo-core.version>
-    <micronaut.version>4.10.7</micronaut.version>
+    <micronaut.version>4.10.10</micronaut.version>
     <micronaut.openapi.version>6.19.1</micronaut.openapi.version>
     <micronaut.tracing.version>7.2.0</micronaut.tracing.version>
     <micronaut-gcp-version>5.13.0</micronaut-gcp-version>
@@ -251,6 +251,11 @@
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
       <version>2.18.4</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.21.1</version>
     </dependency>
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
