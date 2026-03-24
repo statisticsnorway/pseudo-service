@@ -2,6 +2,7 @@ package no.ssb.dlp.pseudo.service.filters;
 
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
+import io.micronaut.cache.annotation.Cacheable;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Value;
 import io.micronaut.http.HttpResponse;
@@ -14,11 +15,15 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
+import no.ssb.dlp.pseudo.service.tracing.WithSpanContext;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
 import java.io.FileInputStream;
 import java.net.URI;
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -52,15 +57,21 @@ public class AccessTokenFilter implements HttpClientFilter {
     }
 
     @SneakyThrows
+    @WithSpan
     public Publisher<? extends HttpResponse<?>> doFilter(MutableHttpRequest<?> request, ClientFilterChain chain) {
-        Optional<AccessTokenFilterConfig> config = getConfig(request);
+        final var currentSpan = WithSpanContext.currentSpan();
+        currentSpan.setAttribute("request.url", request.getUri().toString());
+        final var config = request.getAttribute("micronaut.http.serviceId").map(Object::toString).flatMap(this::getConfig);
+        currentSpan.addEvent("Add bearer auth", Instant.now());
         if (config.isPresent()) {
             request.bearerAuth(getAccessToken(config.get().getAudience()));
-            setProjectIdHeader(request);
         } else {
             request.bearerAuth(getAccessToken(getAudienceFromRequest(request)));
-            setProjectIdHeader(request);
         }
+        currentSpan.addEvent("Add bearer auth (finished)", Instant.now());
+        currentSpan.addEvent("Set project ID", Instant.now());
+        setProjectIdHeader(request);
+        currentSpan.addEvent("Set project ID (finished)", Instant.now());
         return chain.proceed(request);
     }
 
@@ -72,17 +83,19 @@ public class AccessTokenFilter implements HttpClientFilter {
     }
 
     @SneakyThrows
-    private String getAccessToken(String audience) {
+    @WithSpan
+    protected String getAccessToken(String audience) {
         return credentials.createScoped(audience).refreshAccessToken().getTokenValue();
     }
 
-    private Optional<AccessTokenFilterConfig> getConfig(MutableHttpRequest<?> request) {
-        final Optional<Object> serviceId = request.getAttribute("micronaut.http.serviceId");
-
-        if (applicationContext != null && serviceId.isPresent()) {
-            return applicationContext.findBean(AccessTokenFilterConfig.class, Qualifiers.byName(serviceId.get().toString()));
-        }
-        return Optional.empty();
+    @Cacheable(value="access-token-filter-cache", parameters = {"serviceId"})
+    @WithSpan
+    protected Optional<AccessTokenFilterConfig> getConfig(String serviceId) {
+        return Optional
+                .ofNullable(applicationContext)
+                .flatMap(ac ->
+                    ac.findBean(AccessTokenFilterConfig.class, Qualifiers.byName(serviceId))
+                );
     }
 
     private String getAudienceFromRequest(final MutableHttpRequest<?> request) {

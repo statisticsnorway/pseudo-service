@@ -16,7 +16,6 @@ import no.ssb.dapla.dlp.pseudo.func.tink.fpe.TinkFpeFunc;
 import no.ssb.dlp.pseudo.core.PseudoException;
 import no.ssb.dlp.pseudo.core.PseudoKeyset;
 import no.ssb.dlp.pseudo.core.PseudoOperation;
-import no.ssb.dlp.pseudo.core.PseudoSecret;
 import no.ssb.dlp.pseudo.core.field.FieldDescriptor;
 import no.ssb.dlp.pseudo.core.field.ValueInterceptorChain;
 import no.ssb.dlp.pseudo.core.func.PseudoFuncDeclaration;
@@ -29,6 +28,8 @@ import no.ssb.dlp.pseudo.core.tink.model.EncryptedKeysetWrapper;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.FieldMetadata;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.FieldMetric;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.PseudoMetadataProcessor;
+import no.ssb.dlp.pseudo.service.tracing.SpanAttribute;
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.Collection;
 import java.util.List;
@@ -47,12 +48,12 @@ public class RecordMapProcessorFactory {
     private final PseudoSecrets pseudoSecrets;
     private final LoadingCache<String, Aead> aeadCache;
 
-    public RecordMapProcessor<PseudoMetadataProcessor> newPseudonymizeRecordProcessor(List<PseudoConfig> pseudoConfigs, String correlationId) {
+    @WithSpan
+    public RecordMapProcessor<PseudoMetadataProcessor> newPseudonymizeRecordProcessor(@SpanAttribute List<PseudoConfig> pseudoConfigs, String correlationId) {
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
 
         for (PseudoConfig config : pseudoConfigs) {
-            List<PseudoSecret> secrets = pseudoSecrets.resolve();
             for (PseudoKeyset keyset : config.getKeysets()) {
                 log.info(keyset.getKekUri().toString());
             }
@@ -64,6 +65,7 @@ public class RecordMapProcessorFactory {
         return new RecordMapProcessor<>(chain, metadataProcessor);
     }
 
+    @WithSpan
     public RecordMapProcessor<PseudoMetadataProcessor> newDepseudonymizeRecordProcessor(List<PseudoConfig> pseudoConfigs, String correlationId) {
         ValueInterceptorChain chain = new ValueInterceptorChain();
         PseudoMetadataProcessor metadataProcessor = new PseudoMetadataProcessor(correlationId);
@@ -78,8 +80,9 @@ public class RecordMapProcessorFactory {
         return new RecordMapProcessor<>(chain, metadataProcessor);
     }
 
+    @WithSpan
     public RecordMapProcessor<PseudoMetadataProcessor> newRepseudonymizeRecordProcessor(PseudoConfig sourcePseudoConfig,
-                                                               PseudoConfig targetPseudoConfig, String correlationId) {
+                                                                                        PseudoConfig targetPseudoConfig, String correlationId) {
         final PseudoFuncs fieldDepseudonymizer = newPseudoFuncs(sourcePseudoConfig.getRules(),
                 pseudoKeysetsOf(sourcePseudoConfig.getKeysets()));
         final PseudoFuncs fieldPseudonymizer = newPseudoFuncs(targetPseudoConfig.getRules(),
@@ -106,7 +109,8 @@ public class RecordMapProcessorFactory {
         return varValue;
     }
 
-    private String process(PseudoOperation operation,
+    @WithSpan
+    protected String process(PseudoOperation operation,
                            PseudoFuncs func,
                            FieldDescriptor field,
                            String varValue,
@@ -189,8 +193,8 @@ public class RecordMapProcessorFactory {
     private static String normalizePath(String path) {
         // Normalize the path by skipping leading '/' and use dot as separator
         return path.substring(1).replace('/', '.')
-               // Also replace the [] separator in nested structs
-               .replaceAll("\\[\\d*]", "");
+                // Also replace the [] separator in nested structs
+                .replaceAll("\\[\\d*]", "");
     }
 
 

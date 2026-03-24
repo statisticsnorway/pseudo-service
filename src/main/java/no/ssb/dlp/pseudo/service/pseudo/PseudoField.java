@@ -1,6 +1,11 @@
 package no.ssb.dlp.pseudo.service.pseudo;
 
 import com.google.common.base.Stopwatch;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.instrumentation.annotations.AddingSpanAttributes;
+import io.opentelemetry.instrumentation.annotations.SpanAttribute;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import lombok.AccessLevel;
@@ -15,6 +20,7 @@ import no.ssb.dlp.pseudo.core.tink.model.EncryptedKeysetWrapper;
 import no.ssb.dlp.pseudo.core.util.Json;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.FieldMetric;
 import no.ssb.dlp.pseudo.service.pseudo.metadata.PseudoMetadataProcessor;
+import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 
 import java.util.List;
 import java.util.Map;
@@ -75,21 +81,23 @@ public class PseudoField {
     /**
      * Creates a Flowable that processes each value of the field, by applying the configured pseudo rules using a recordMapProcessor.
      * This variant of the process() method is intended for "pseudonymize" and "depseudonymize" operations.
+     *
      * @param pseudoConfigSplitter   The PseudoConfigSplitter instance to use for splitting pseudo configurations.
      * @param recordProcessorFactory The RecordMapProcessorFactory instance to use for creating a new PseudonymizeRecordProcessor.
      * @param values                 The values to be processed.
      * @return A Flowable stream that processes the field values by applying the configured pseudo rules, and returns them as a lists of strings.
      */
+    @WithSpan
     public Flowable<String> process(PseudoConfigSplitter pseudoConfigSplitter,
-                                          RecordMapProcessorFactory recordProcessorFactory,
-                                          List<String> values,
-                                          PseudoOperation pseudoOperation,
-                                          String correlationId) {
+                                    RecordMapProcessorFactory recordProcessorFactory,
+                                    List<String> values,
+                                    PseudoOperation pseudoOperation,
+                                    String correlationId) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         List<PseudoConfig> pseudoConfigs = pseudoConfigSplitter.splitIfNecessary(this.getPseudoConfig());
 
         RecordMapProcessor<PseudoMetadataProcessor> recordMapProcessor;
-        switch (pseudoOperation){
+        switch (pseudoOperation) {
             case PSEUDONYMIZE -> recordMapProcessor = recordProcessorFactory.
                     newPseudonymizeRecordProcessor(pseudoConfigs, correlationId);
             case DEPSEUDONYMIZE -> recordMapProcessor = recordProcessorFactory.
@@ -124,14 +132,16 @@ public class PseudoField {
     /**
      * Creates a Flowable that processes each value of the field, by applying the configured pseudo rules using a recordMapProcessor.
      * This variant of the process() method is intended for the "repseudonymize" operation.
+     *
      * @param recordProcessorFactory The RecordMapProcessorFactory instance to use for creating a new PseudonymizeRecordProcessor.
      * @param values                 The values to be processed.
      * @return A Flowable stream that processes the field values by applying the configured pseudo rules, and returns them as a lists of strings.
      */
+    @WithSpan
     public Flowable<String> process(RecordMapProcessorFactory recordProcessorFactory,
-                                          List<String> values,
-                                          PseudoField targetPseudoField,
-                                          String correlationId) {
+                                    List<String> values,
+                                    PseudoField targetPseudoField,
+                                    String correlationId) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         PseudoConfig targetPseudoConfig = targetPseudoField.getPseudoConfig();
         RecordMapProcessor<PseudoMetadataProcessor> recordMapProcessor = recordProcessorFactory.

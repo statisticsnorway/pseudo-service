@@ -63,6 +63,11 @@ spec:
     path: /prometheus
     port: "10220"
 
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+
   env:
     - name: MICRONAUT_CONFIG_FILES
       value: /conf/bootstrap-test.yml,/conf/application-test.yml,/conf/protected/app-roles.yml
@@ -205,7 +210,7 @@ data:
                   keycloak-nais-test:
                     url: 'https://auth.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
                   keycloak-nais-dev:
-                    url: https://auth-play.test.ssb.no/realms/ssb/protocol/openid-connect/certs
+                    url: 'https://auth-play.test.ssb.no/realms/ssb/protocol/openid-connect/certs'
                   google:
                     url: 'https://www.googleapis.com/oauth2/v3/certs'
                   lab-id-north1-test:
@@ -235,6 +240,13 @@ data:
         io.micronaut.security: INFO
         no.ssb.dlp.pseudo.service: INFO
         io.micronaut.security.token.jwt.validator: DEBUG
+
+        # Debugg otel tracing instrumentation and exporting
+        io.micronaut.tracing: DEBUG
+        io.micronaut.tracing.opentelemetry: DEBUG
+        io.opentelemetry: DEBUG
+        io.opentelemetry.sdk: DEBUG
+        io.opentelemetry.exporter: DEBUG
 
     services:
       secrets:
@@ -268,3 +280,7 @@ data:
       default-target-root: gs://ssb-staging-dapla-pseudo-service-data-export/felles
 
     sid.mapper.partition.size: 100000
+
+    otel:
+      traces:
+        exporter: otlp

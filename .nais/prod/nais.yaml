@@ -14,7 +14,7 @@ spec:
   port: 10210
   terminationGracePeriodSeconds: 180
   replicas:
-    max: 10
+    max: 20
     min: 2
   resources:
     requests:
