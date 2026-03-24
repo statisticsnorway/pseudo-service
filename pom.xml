@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>no.ssb.dapla.dlp.pseudo</groupId>
   <artifactId>pseudo-service</artifactId>
-  <version>3.2.5-SNAPSHOT</version>
+  <version>3.2.6-SNAPSHOT</version>
   <name>pseudo-service</name>
 
   <parent>
@@ -209,7 +209,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.7</version>
+      <version>3.18.0</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>

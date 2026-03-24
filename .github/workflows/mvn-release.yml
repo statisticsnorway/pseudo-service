@@ -9,7 +9,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     # Do not run workflow if the triggering commit created the 'release' branch
-    if: ${{github.event.created}} == false
+    if: ${{ github.event.created == false }}
     permissions:
       contents: write
       id-token: write
