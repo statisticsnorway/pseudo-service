@@ -42,7 +42,21 @@
     <lombok.version>1.18.38</lombok.version>
     <mockito.version>5.17.0</mockito.version>
     <cyclonedx-maven-plugin.version>2.8.1</cyclonedx-maven-plugin.version>
+    <netty.version>4.2.12.Final</netty.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Pin Netty artifacts to a patched version for known vulnerabilities. -->
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-bom</artifactId>
+        <version>${netty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <scm>
     <developerConnection>scm:git:https://github.com/${github.repository}.git</developerConnection>
