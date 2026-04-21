@@ -7,14 +7,17 @@ on:
         description: Registry, for example "europe-north1-docker.pkg.dev"
         required: true
         type: string
+        default: "europe-north1-docker.pkg.dev"
       repository:
         description: Registry repository
         required: true
         type: string
+        default: "dapla-stat"
       image-name:
         description: Image name
         required: true
         type: string
+        default: "pseudo-service"
       image-tag:
         description: Tag for the image
         required: true
@@ -22,16 +25,22 @@ on:
       cluster:
         description: NAIS cluster environment
         required: true
-        type: string
+        type: choice
+        options:
+          - "test"
+          - "prod"
       nais-config-path:
         description: Path to the NAIS configuration file
         required: true
-        type: string
+        type: choice
+        options:
+          - ".nais/test/nais.yaml"
+          - ".nais/prod/nais.yaml"
       ref:
         description: Commit reference of the deployment
         required: false
-        default: master
         type: string
+        default: "master"
 
   workflow_call:
     inputs:
