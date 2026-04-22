@@ -20,7 +20,7 @@ jobs:
         uses: actions/create-github-app-token@v3
         id: app-token
         with:
-          app-id: ${{ secrets.DAPLA_BOT_APP_ID }}
+          client-id: ${{ secrets.DAPLA_BOT_APP_ID }}
           private-key: ${{ secrets.DAPLA_BOT_PRIVATE_KEY }}
       
       - uses: actions/checkout@v6
