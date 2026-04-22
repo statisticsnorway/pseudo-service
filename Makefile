@@ -26,12 +26,12 @@ validate-local-config: ## Validate and echo local app config
 	@echo "Environment variables ... file://$(realpath $(LOCAL_ENV_FILE))"
 	@echo "Application config ...... file://$(realpath $(LOCAL_APP_SA_KEY_FILE))"
 
-.PHONY: run-local
-run-local: validate-local-config
+.PHONY: run-local 
+run-local: ## Run the application with the micronaut local environment
 	java ${JAVA_OPTS} --enable-preview -Dmicronaut.config.files=conf/application-local.yml  -Dmicronaut.environments=local,local-sid -jar target/pseudo-service-*-SNAPSHOT.jar
 
-.PHONY: release
-release:
+.PHONY: release 
+release:  ## Create a new release
 	@set -e ; \
 	git checkout master && \
 	git pull && \
