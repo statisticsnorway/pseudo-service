@@ -32,7 +32,7 @@ jobs:
       nais-config-path: ${{steps.nais-deploy-vars.outputs.nais_config_path}}
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Fail build on Critical Vulnerabilities
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
