@@ -82,9 +82,9 @@ jobs:
       contents: "read"
       id-token: "write"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: actions/create-github-app-token@v3
+      - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3
         id: app-token
         with:
           client-id: ${{ secrets.DAPLA_BOT_APP_ID }}
@@ -92,7 +92,7 @@ jobs:
           owner: statisticsnorway
           repositories: dapla-pseudo-iac
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         name: Retrieve protected configuration
         with:
           repository: "statisticsnorway/dapla-pseudo-iac"
@@ -106,7 +106,7 @@ jobs:
           ext_config_dir="ext-config/apps/nais/pseudo-service/${{ inputs.cluster }}"
           echo "ext_config=${ext_config_dir}" >> $GITHUB_ENV
       
-      - uses: nais/deploy/actions/deploy@v2
+      - uses: nais/deploy/actions/deploy@823ec9b7e305ce7cf911d0f9a25f7da9d7486cf2 # v2
         env:
           CLUSTER: ${{ inputs.cluster }}
           RESOURCE: ${{ inputs.nais-config-path }},${{ env.ext_config }}/app-roles.yml
