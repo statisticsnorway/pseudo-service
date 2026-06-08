@@ -287,7 +287,6 @@
     <dependency>
       <groupId>io.micronaut.test</groupId>
       <artifactId>micronaut-test-junit5</artifactId>
-      <version>4.6.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
