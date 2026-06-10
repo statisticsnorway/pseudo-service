@@ -19,7 +19,7 @@
             gnumake
             nixd
             maven
-            openjdk
+            openjdk25
             yaml-language-server
           ];
         };

@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk:21
+FROM azul/zulu-openjdk:25
 RUN apt-get -qq update && apt-get -y dist-upgrade && apt-get -y --no-install-recommends install curl
 COPY target/pseudo-service-*.jar pseudo-service.jar
 COPY src/main/resources/logback*.xml /conf/
