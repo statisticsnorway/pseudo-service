@@ -12,7 +12,6 @@ public class PseudoResponseSerializer {
      * @param metadata  a flowable of String elements, each in JSON-format
      * @param logs      a flowable of String elements, each in JSON-format
      * @param metrics   a flowable of String elements, each in JSON-format
-     * @param metrics
      */
     public static Flowable<String> serialize(Flowable<String> data, Flowable<String> metadata,
                                              Flowable<String> logs, Flowable<String> metrics) {
