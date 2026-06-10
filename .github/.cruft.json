@@ -7,7 +7,7 @@
       "repo_name": "dapla-dlp-pseudo-service",
       "team_uniform_name": "dapla-stat",
       "program_type": "APPLICATION",
-      "java_version": "21",
+      "java_version": "25",
       "default_branch_name": "master",
       "__gha_folder_name": ".github",
       "_template": "https://github.com/statisticsnorway/cookiecutter-maven-build-deploy"
