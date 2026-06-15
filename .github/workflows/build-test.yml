@@ -8,6 +8,10 @@ on:
       - ".mvn"
       - ".gitignore"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
 env:
   DAPLA_REGISTRY: europe-north1-docker.pkg.dev/${{secrets.GAR_PROJECT_ID}}/dapla-stat-docker
 
