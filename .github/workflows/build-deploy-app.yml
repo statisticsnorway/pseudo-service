@@ -176,16 +176,16 @@ jobs:
 
         if [[ ${{github.event_name}} == "release" ]]; then
           echo "environment=prod" >> "$GITHUB_ENV"
-          echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL_PROD }}" >> "$GITHUB_ENV"
         else
           echo "environment=test" >> "$GITHUB_ENV"
-          echo "SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL_TEST }}" >> "$GITHUB_ENV"
         fi
 
     - name: Send custom JSON data to Slack workflow
       id: slack
-      uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
+      uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
       with:
+        webhook: ${{ github.event_name == 'release' && secrets.SLACK_WEBHOOK_URL_PROD || secrets.SLACK_WEBHOOK_URL_TEST }}
+        webhook-type: incoming-webhook
         payload: |
           {
             "text": "The build or deploy of Pseudo Service failed",
@@ -218,5 +218,3 @@ jobs:
               }
             ]
           }
-      env:
-        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
