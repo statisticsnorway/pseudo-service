@@ -106,7 +106,7 @@ jobs:
           ext_config_dir="ext-config/apps/nais/pseudo-service/${{ inputs.cluster }}"
           echo "ext_config=${ext_config_dir}" >> $GITHUB_ENV
       
-      - uses: nais/deploy/actions/deploy@823ec9b7e305ce7cf911d0f9a25f7da9d7486cf2 # v2
+      - uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
         env:
           CLUSTER: ${{ inputs.cluster }}
           RESOURCE: ${{ inputs.nais-config-path }},${{ env.ext_config }}/app-roles.yml
