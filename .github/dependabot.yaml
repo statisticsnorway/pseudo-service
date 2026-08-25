@@ -6,3 +6,9 @@ updates:
       default-days: 7
     schedule:
       interval: "monthly"
+  - package-ecosystem: "maven"
+    directory: "/"
+    cooldown:
+      default-days: 7
+    schedule:
+      interval: "monthly"
