@@ -4,7 +4,9 @@ import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import io.micronaut.cache.annotation.Cacheable;
 import io.micronaut.context.ApplicationContext;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.annotation.Value;
+import io.micronaut.context.env.Environment;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.filter.ClientFilterChain;
@@ -32,6 +34,7 @@ import java.util.Optional;
  * {@see io.micronaut.gcp.http.client.GoogleAuthFilter} which only uses the Compute metadata server).
  */
 @AccessTokenFilterMatcher
+@Requires(notEnv = Environment.TEST)
 @Singleton
 @Data
 @Slf4j

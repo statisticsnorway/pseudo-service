@@ -56,18 +56,6 @@
       <url>https://repo.maven.apache.org/maven2</url>
     </repository>
     <repository>
-      <id>dapla-artifact-registry</id>
-      <url>${dapla-artifact-registry.url}</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-
-    <repository>
       <!--
       GitHub maven registry packages require authentication.
       This needs to be configured in the users ~/.m2/settings.xml
@@ -79,10 +67,6 @@
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
-    </repository>
-    <repository>
-      <id>dapla-stat</id>
-      <url>artifactregistry://europe-north1-maven.pkg.dev/artifact-registry-5n/dapla-stat-maven</url>
     </repository>
   </repositories>
 
@@ -668,6 +652,23 @@
     </profile>
     <profile>
       <id>dapla-artifact-registry</id>
+      <repositories>
+        <repository>
+          <id>dapla-artifact-registry</id>
+          <url>${dapla-artifact-registry.url}</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>dapla-stat</id>
+          <url>artifactregistry://europe-north1-maven.pkg.dev/artifact-registry-5n/dapla-stat-maven</url>
+        </repository>
+      </repositories>
       <distributionManagement>
         <repository>
           <id>dapla-artifact-registry</id>
