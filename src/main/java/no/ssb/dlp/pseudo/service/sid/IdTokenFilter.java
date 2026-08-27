@@ -4,6 +4,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.IdToken;
 import com.google.auth.oauth2.IdTokenProvider;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.env.Environment;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.filter.ClientFilterChain;
@@ -25,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * uses the Compute metadata server.
  */
 @IdTokenFilterMatcher
-@Requires(notEnv = "k8s")
+@Requires(notEnv = {"k8s", Environment.TEST})
 @Singleton
 @Slf4j
 public class IdTokenFilter implements HttpClientFilter {
