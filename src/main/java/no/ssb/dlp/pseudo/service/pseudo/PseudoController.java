@@ -97,6 +97,8 @@ public class PseudoController {
             return HttpResponse.ok(
               result
             ).characterEncoding(StandardCharsets.UTF_8);
+        } catch (PseudoFuncFactory.PseudoFuncInitException e) {
+            throw e;
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
         }
