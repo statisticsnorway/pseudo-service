@@ -30,7 +30,6 @@ import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 import no.ssb.dlp.pseudo.service.tracing.WithSpanContext;
 import org.slf4j.MDC;
 
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
@@ -234,9 +233,13 @@ public class PseudoController {
 
     @Error
     public HttpResponse<JsonError> sidVersionInvalid(HttpRequest request, PseudoFuncFactory.PseudoFuncInitException e) {
-        if (e.getCause() instanceof InvocationTargetException && e.getCause().getCause() instanceof InvalidSidSnapshotDateException) {
-            JsonError error = new JsonError(e.getCause().getCause().getMessage()).link(Link.SELF, Link.of(request.getUri()));
-            return HttpResponse.<JsonError>badRequest().body(error);
+        Throwable cause = e;
+        while (cause != null) {
+            if (cause instanceof InvalidSidSnapshotDateException) {
+                JsonError error = new JsonError(cause.getMessage()).link(Link.SELF, Link.of(request.getUri()));
+                return HttpResponse.<JsonError>badRequest().body(error);
+            }
+            cause = cause.getCause();
         }
         JsonError error = new JsonError(e.getMessage()).link(Link.SELF, Link.of(request.getUri()));
         return HttpResponse.<JsonError>serverError().status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
