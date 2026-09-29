@@ -97,6 +97,8 @@ public class PseudoController {
             return HttpResponse.ok(
               result
             ).characterEncoding(StandardCharsets.UTF_8);
+        } catch (PseudoFuncFactory.PseudoFuncInitException e) {
+            throw e;
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
         }
@@ -129,6 +131,8 @@ public class PseudoController {
             final String correlationId = MDC.get("CorrelationID");
 
             return HttpResponse.ok(pseudoField.process(pseudoConfigSplitter, recordProcessorFactory, req.values, PseudoOperation.DEPSEUDONYMIZE, correlationId).map(o -> o.getBytes(StandardCharsets.UTF_8))).characterEncoding(StandardCharsets.UTF_8);
+        } catch (PseudoFuncFactory.PseudoFuncInitException e) {
+            throw e;
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
         }
@@ -161,6 +165,8 @@ public class PseudoController {
 
             final String correlationId = MDC.get("CorrelationID");
             return HttpResponse.ok(sourcePseudoField.process(recordProcessorFactory, req.values, targetPseudoField, correlationId).map(o -> o.getBytes(StandardCharsets.UTF_8))).characterEncoding(StandardCharsets.UTF_8);
+        } catch (PseudoFuncFactory.PseudoFuncInitException e) {
+            throw e;
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
         }
