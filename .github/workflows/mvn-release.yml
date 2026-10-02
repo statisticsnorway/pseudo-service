@@ -67,8 +67,8 @@ jobs:
           githubServer: false
           servers: >-
             [
-              {"id": "ssb-datadoc-model", "username": "${{ github.actor }}", "password": "${{ steps.app-token.outputs.token }}"},
-              {"id": "github", "username": "${{ github.actor }}", "password": "${{ steps.app-token.outputs.token }}"}
+              {"id": "ssb-datadoc-model", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"},
+              {"id": "github", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"}
             ]
       
       - name: Maven release and deploy to GitHub packages
