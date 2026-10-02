@@ -66,8 +66,10 @@ jobs:
           override: true
           githubServer: false
           servers: >-
-            [{"id": "github","username": "${{steps.get-bot-vars.outputs.bot_email}}","password": "${{steps.app-token.outputs.token}}",
-            "configuration": {"httpHeaders": {"property": {"name": "Authorization","value": "Bearer ${{ secrets.GITHUB_TOKEN }}"}}}}]
+            [
+              {"id": "ssb-datadoc-model", "username": "${{ github.actor }}", "password": "${{ steps.app-token.outputs.token }}"},
+              {"id": "github", "username": "${{ github.actor }}", "password": "${{ steps.app-token.outputs.token }}"}
+            ]
       
       - name: Maven release and deploy to GitHub packages
         id: release-artifact
