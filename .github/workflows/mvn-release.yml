@@ -22,6 +22,7 @@ jobs:
         with:
           client-id: ${{ secrets.DAPLA_BOT_APP_ID }}
           private-key: ${{ secrets.DAPLA_BOT_PRIVATE_KEY }}
+          owner: statisticsnorway
       
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -67,8 +68,8 @@ jobs:
           githubServer: false
           servers: >-
             [
-              {"id": "ssb-datadoc-model", "username": "${{ github.actor }}", "password": "${{ steps.app-token.outputs.token }}"},
-              {"id": "github", "username": "${{ github.actor }}", "password": "${{ steps.app-token.outputs.token }}"}
+              {"id": "ssb-datadoc-model", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"},
+              {"id": "github", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"}
             ]
       
       - name: Maven release and deploy to GitHub packages
