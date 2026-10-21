@@ -9,7 +9,7 @@
   <parent>
     <groupId>io.micronaut.platform</groupId>
     <artifactId>micronaut-parent</artifactId>
-    <version>5.1.0</version>
+    <version>5.2.3</version>
   </parent>
 
   <properties>
@@ -25,11 +25,6 @@
     <dapla-datadoc-model.version>1.4</dapla-datadoc-model.version>
     <artifactregistry-maven-wagon.version>2.2.1</artifactregistry-maven-wagon.version>
     <dapla-dlp-pseudo-core.version>2.0.8</dapla-dlp-pseudo-core.version>
-    <micronaut.version>5.1.11</micronaut.version>
-    <micronaut.openapi.version>7.1.1</micronaut.openapi.version>
-    <micronaut.tracing.version>8.2.0</micronaut.tracing.version>
-    <micronaut-gcp-version>6.1.0</micronaut-gcp-version>
-    <micronaut.validation.version>5.1.0</micronaut.validation.version>
     <auto-service.version>1.1.1</auto-service.version>
     <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
     <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
@@ -148,13 +143,13 @@
     <dependency>
       <groupId>io.micronaut.gcp</groupId>
       <artifactId>micronaut-gcp-common</artifactId>
-      <version>${micronaut-gcp-version}</version>
+      <version>${micronaut.gcp.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.micronaut.gcp</groupId>
       <artifactId>micronaut-gcp-secret-manager</artifactId>
-      <version>${micronaut-gcp-version}</version>
+      <version>${micronaut.gcp.version}</version>
     </dependency>
     <dependency>
       <groupId>io.grpc</groupId>
@@ -169,12 +164,12 @@
     <dependency>
       <groupId>io.micronaut</groupId>
       <artifactId>micronaut-context</artifactId>
-      <version>${micronaut.version}</version>
+      <version>${micronaut.core.version}</version>
     </dependency>
     <dependency>
       <groupId>io.micronaut</groupId>
       <artifactId>micronaut-context-propagation</artifactId>
-      <version>${micronaut.version}</version>
+      <version>${micronaut.core.version}</version>
     </dependency>
     <dependency>
       <groupId>io.micronaut.objectstorage</groupId>
