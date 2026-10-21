@@ -29,7 +29,7 @@ jobs:
           ref: refs/heads/master
 
       - name: Set up JDK 25
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           java-version: 25
           distribution: temurin
@@ -66,8 +66,10 @@ jobs:
           override: true
           githubServer: false
           servers: >-
-            [{"id": "github","username": "${{steps.get-bot-vars.outputs.bot_email}}","password": "${{steps.app-token.outputs.token}}",
-            "configuration": {"httpHeaders": {"property": {"name": "Authorization","value": "Bearer ${{ secrets.GITHUB_TOKEN }}"}}}}]
+            [
+              {"id": "ssb-datadoc-model", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"},
+              {"id": "github", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"}
+            ]
       
       - name: Maven release and deploy to GitHub packages
         id: release-artifact

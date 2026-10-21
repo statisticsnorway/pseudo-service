@@ -30,7 +30,6 @@ import no.ssb.dlp.pseudo.service.tracing.WithSpan;
 import no.ssb.dlp.pseudo.service.tracing.WithSpanContext;
 import org.slf4j.MDC;
 
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
@@ -97,6 +96,8 @@ public class PseudoController {
             return HttpResponse.ok(
               result
             ).characterEncoding(StandardCharsets.UTF_8);
+        } catch (PseudoFuncFactory.PseudoFuncInitException e) {
+            throw e;
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
         }
@@ -129,6 +130,8 @@ public class PseudoController {
             final String correlationId = MDC.get("CorrelationID");
 
             return HttpResponse.ok(pseudoField.process(pseudoConfigSplitter, recordProcessorFactory, req.values, PseudoOperation.DEPSEUDONYMIZE, correlationId).map(o -> o.getBytes(StandardCharsets.UTF_8))).characterEncoding(StandardCharsets.UTF_8);
+        } catch (PseudoFuncFactory.PseudoFuncInitException e) {
+            throw e;
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
         }
@@ -161,6 +164,8 @@ public class PseudoController {
 
             final String correlationId = MDC.get("CorrelationID");
             return HttpResponse.ok(sourcePseudoField.process(recordProcessorFactory, req.values, targetPseudoField, correlationId).map(o -> o.getBytes(StandardCharsets.UTF_8))).characterEncoding(StandardCharsets.UTF_8);
+        } catch (PseudoFuncFactory.PseudoFuncInitException e) {
+            throw e;
         } catch (Exception e) {
             return HttpResponse.serverError(Flowable.error(e));
         }
@@ -228,9 +233,13 @@ public class PseudoController {
 
     @Error
     public HttpResponse<JsonError> sidVersionInvalid(HttpRequest request, PseudoFuncFactory.PseudoFuncInitException e) {
-        if (e.getCause() instanceof InvocationTargetException && e.getCause().getCause() instanceof InvalidSidSnapshotDateException) {
-            JsonError error = new JsonError(e.getCause().getCause().getMessage()).link(Link.SELF, Link.of(request.getUri()));
-            return HttpResponse.<JsonError>badRequest().body(error);
+        Throwable cause = e;
+        while (cause != null) {
+            if (cause instanceof InvalidSidSnapshotDateException) {
+                JsonError error = new JsonError(cause.getMessage()).link(Link.SELF, Link.of(request.getUri()));
+                return HttpResponse.<JsonError>badRequest().body(error);
+            }
+            cause = cause.getCause();
         }
         JsonError error = new JsonError(e.getMessage()).link(Link.SELF, Link.of(request.getUri()));
         return HttpResponse.<JsonError>serverError().status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
