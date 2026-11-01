@@ -23,7 +23,7 @@
     <github.repository>statisticsnorway/pseudo-service</github.repository>
     <exec.mainClass>no.ssb.dlp.pseudo.service.Application</exec.mainClass>
     <jackson2.version>2.22.4</jackson2.version>
-    <dapla-datadoc-model.version>1.4</dapla-datadoc-model.version>
+    <dapla-datadoc-model.version>1.7</dapla-datadoc-model.version>
     <artifactregistry-maven-wagon.version>2.2.5</artifactregistry-maven-wagon.version>
     <dapla-dlp-pseudo-core.version>2.0.8</dapla-dlp-pseudo-core.version>
     <auto-service.version>1.1.1</auto-service.version>
